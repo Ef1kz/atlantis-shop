@@ -1,0 +1,36 @@
+<!-- templates/cart/detail.html -->
+{% extends 'base.html' %}
+
+{% block title %}Корзина — ATLANTIS{% endblock %}
+
+{% block content %}
+<h1 class="gold text-center mb-4">ВАША КОРЗИНА</h1>
+
+{% if cart_items %}
+<div class="row">
+    <div class="col-md-8">
+        {% for item in cart_items %}
+        <div class="card bg-dark text-white mb-3">
+            <div class="card-body">
+                <h5 class="card-title gold">{{ item.name }}</h5>
+                <p>Количество: {{ item.quantity }}</p>
+                <p>Цена за шт: {{ item.price }} ₽</p>
+                <p>Итого: {{ item.subtotal|floatformat:2 }} ₽</p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    <div class="col-md-4">
+        <div class="card bg-gold text-dark p-4">
+            <h3>Итого: {{ total|floatformat:2 }} ₽</h3>
+            <a href="{% url 'cart:checkout' %}" class="btn btn-action w-100 mt-3">Оформить заказ</a>
+        </div>
+    </div>
+</div>
+{% else %}
+<div class="text-center">
+    <p class="lead">Корзина пуста.</p>
+    <a href="{% url 'products:product_list' %}" class="btn btn-gold">Перейти в каталог</a>
+</div>
+{% endif %}
+{% endblock %}

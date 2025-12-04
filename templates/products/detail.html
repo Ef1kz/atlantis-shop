@@ -1,0 +1,46 @@
+<!-- templates/products/detail.html -->
+{% extends 'base.html' %}
+
+{% block title %}{{ product.name }} — ATLANTIS{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-6">
+        {% if product.image %}
+        <img src="{{ product.image.url }}" class="img-fluid rounded" alt="{{ product.name }}">
+        {% else %}
+        <img src="https://via.placeholder.com/600x400/333/FFD700?text={{ product.name }}" class="img-fluid rounded" alt="Без изображения">
+        {% endif %}
+    </div>
+    <div class="col-md-6">
+        <h1 class="gold">{{ product.name }}</h1>
+        <p class="lead">Цена: <strong>{{ product.price }} ₽</strong></p>
+        <p><strong>Коллекция:</strong> {{ product.collection }}</p>
+        <p><strong>Цвет:</strong> {{ product.color|default:"Не указан" }}</p>
+        <p><strong>Размеры:</strong> {{ product.width }}x{{ product.height }}x{{ product.depth }} см</p>
+        <p>{{ product.description }}</p>
+
+        <form method="post" action="{% url 'cart:add' product.pk %}">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-action mt-3 w-100">Добавить в корзину</button>
+        </form>
+    </div>
+</div>
+
+<hr>
+
+<h3 class="gold mt-5">Отзывы ({{ reviews.count }})</h3>
+{% for review in reviews %}
+<div class="card bg-dark text-white mb-3">
+    <div class="card-body">
+        <h5 class="card-title">{{ review.user.username }} — {{ review.rating }}★</h5>
+        <p class="card-text">{{ review.text }}</p>
+        <small class="text-muted">Дата: {{ review.created_at|date:"d.m.Y H:i" }}</small>
+    </div>
+</div>
+{% empty %}
+<p>Пока нет отзывов.</p>
+{% endfor %}
+
+<a href="#" class="btn btn-action mt-3">Оставить отзыв</a>
+{% endblock %}

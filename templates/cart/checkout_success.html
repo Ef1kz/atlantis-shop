@@ -1,0 +1,14 @@
+<!-- templates/cart/checkout_success.html -->
+{% extends 'base.html' %}
+
+{% block title %}Заказ оформлен — ATLANTIS{% endblock %}
+
+{% block content %}
+<div class="text-center mt-5">
+    <h1 class="gold">СПАСИБО ЗА ЗАКАЗ!</h1>
+    <p class="lead">Ваш заказ ожидает подтверждения менеджером.</p>
+    <p>Вы получите уведомление по email или SMS.</p>
+    <a href="/" class="btn btn-gold mt-3">На главную</a>
+    <a href="{% url 'cart:detail' %}" class="btn btn-action mt-3">← Назад в корзину</a>
+</div>
+{% endblock %}

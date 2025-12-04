@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Главная — ATLANTIS{% endblock %}
+
+{% block content %}
+<h1 class="section-title">НАША ПРОДУКЦИЯ</h1>
+
+<div class="row g-4">
+    {% for category in categories %}
+    <div class="col-md-3">
+        <a href="{% url 'products:product_list_by_collection' category.slug %}" class="text-decoration-none">
+            <div class="category-card" style="background-image: url('{% static 'images/categories/' %}{{ category.slug }}-bg.png');">
+                <h2>{{ category.name }}</h2>
+            </div>
+        </a>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}
