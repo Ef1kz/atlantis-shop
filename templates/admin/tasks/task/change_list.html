@@ -1,0 +1,30 @@
+{% extends "admin/base.html" %}
+{% load static %}
+
+{% block title %}Корпоративные задачи{% endblock %}
+
+{% block content %}
+<div class="breadcrumbs">
+    <ul>
+        <li><a href="/admin/">Главная</a></li>
+        <li><a href="/admin/tasks/task/">Корпоративные задачи</a></li>
+        <li>Доска задач</li>
+    </ul>
+</div>
+
+<div class="kanban-board">
+    {% for status, tasks in tasks_by_status.items %}
+    <div class="kanban-column" id="{{ status }}">
+        <h3>{{ status|title }} <i class="fas fa-chevron-down"></i></h3>
+        {% for task in tasks %}
+        <div class="kanban-task" data-task-id="{{ task.id }}">
+            <h4>{{ task.title }}</h4>
+            <p>{{ task.description|truncatechars:80 }}</p>
+            <span class="task-status status-{{ task.status }}">{{ task.get_status_display }}</span>
+        </div>
+        {% endfor %}
+        <button class="add-task-btn">Добавить задачу</button>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

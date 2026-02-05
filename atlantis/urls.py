@@ -1,12 +1,16 @@
+# atlantis/urls.py
 from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib.auth import views as auth_views
 from django.contrib.auth.views import LogoutView
+from atlantis.admin import admin_site  # ← Импортируем кастомную админку
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    # Используем кастомную админку вместо стандартной
+    path('admin/', admin_site.urls),  # ← ИЗМЕНЕНО: admin.site.urls -> admin_site.urls
+
     path('', include('core.urls')),
     path('products/', include(('products.urls', 'products'))),
     path('cart/', include('cart.urls')),

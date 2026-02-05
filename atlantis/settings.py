@@ -1,3 +1,4 @@
+# settings.py
 import os
 from pathlib import Path
 
@@ -14,7 +15,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-
+    'django_extensions',
     # Твои приложения
     'core',
     'products',
@@ -23,6 +24,7 @@ INSTALLED_APPS = [
     'accounts',
     'cart',
     'api',
+    'tasks',  # ← НОВАЯ СТРОКА: добавляем приложение задач
 ]
 
 MIDDLEWARE = [
@@ -68,7 +70,7 @@ AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 
-# === КЛЮЧЕВЫЕ НАСТРОЙКИ ===
+# ============ КЛЮЧЕВЫЕ НАСТРОЙКИ ============
 LANGUAGE_CODE = 'ru-ru'          # ← Русский язык
 TIME_ZONE = 'Europe/Moscow'
 USE_I18N = True

@@ -1,0 +1,55 @@
+{% extends "admin/base.html" %}
+{% load static %}
+
+{% block title %}Корпоративная панель{% endblock %}
+
+{% block content %}
+<div class="dashboard-menu">
+    <!-- ВСЕ 6 КНОПОК В ОДНОМ БЛОКЕ -->
+    <div class="dashboard-menu-item">
+        <a href="/admin/auth/user/">
+            <i class="fas fa-users fa-3x"></i>
+            <div class="menu-text">Пользователи</div>
+        </a>
+    </div>
+    <div class="dashboard-menu-item">
+        <a href="/admin/products/product/">
+            <i class="fas fa-box-open fa-3x"></i>
+            <div class="menu-text">Товары</div>
+        </a>
+    </div>
+    <div class="dashboard-menu-item">
+        <a href="/admin/orders/order/">
+            <i class="fas fa-shopping-cart fa-3x"></i>
+            <div class="menu-text">Заказы</div>
+        </a>
+    </div>
+    <div class="dashboard-menu-item">
+        <a href="/admin/tasks/task/">
+            <i class="fas fa-tasks fa-3x"></i>
+            <div class="menu-text">Задачи</div>
+        </a>
+    </div>
+    <div class="dashboard-menu-item">
+        <a href="/admin/reviews/review/">
+            <i class="fas fa-comments fa-3x"></i>
+            <div class="menu-text">Отзывы</div>
+        </a>
+    </div>
+    <div class="dashboard-menu-item">
+        <a href="/admin/cart/cart/">
+            <i class="fas fa-shopping-bag fa-3x"></i>
+            <div class="menu-text">Корзина</div>
+        </a>
+    </div>
+</div>
+
+<div class="recent-actions">
+    <h2>Последние действия</h2>
+    <ul>
+        <li><a href="/admin/tasks/task/">Просмотр задач</a></li>
+        <li><a href="/admin/orders/order/">Проверка новых заказов</a></li>
+        <li><a href="/admin/reviews/review/">Обработка отзывов</a></li>
+    </ul>
+</div>
+{% endblock %}

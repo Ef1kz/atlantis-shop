@@ -1,0 +1,1076 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8">
+    <title>{% block title %}ATLANTIS Администрирование{% endblock %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'admin/css/base.css' %}">
+    <link rel="stylesheet" href="{% static 'admin/css/responsive.css' %}">
+    <style>
+        :root {
+            --primary-color: #f4a261;
+            --secondary-color: #1a1a1a;
+            --background-color: #0a0a0a;
+            --text-color: #e0e0e0;
+            --border-color: #2d2d2d;
+            --card-hover: #2d2d2d;
+        }
+
+        body {
+            background-color: var(--background-color);
+            color: var(--text-color);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Верхняя панель */
+        #header {
+            background: linear-gradient(to right, #1a4a6e, #2a6c91);
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+        }
+
+        #branding h1 {
+            margin: 0;
+            font-size: 1.8rem;
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        #user-tools {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        #user-tools a {
+            color: var(--text-color);
+            text-decoration: none;
+            font-size: 0.95rem;
+            transition: all 0.2s;
+        }
+
+        #user-tools a:hover {
+            color: var(--primary-color);
+        }
+
+        #user-tools .user {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        #user-tools .user img {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--primary-color);
+        }
+
+        /* Основное содержимое */
+        #content {
+            margin-top: 80px;
+            padding: 30px;
+            min-height: calc(100vh - 80px);
+        }
+
+        /* Меню */
+        .dashboard-menu {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px;
+            padding: 25px;
+            margin: 0 20px 30px;
+        }
+
+        .dashboard-menu-item {
+            background: var(--secondary-color);
+            border-radius: 15px;
+            padding: 30px 25px;
+            text-align: center;
+            color: var(--primary-color);
+            font-weight: 600;
+            font-size: 1.3rem;
+            transition: all 0.3s ease;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            cursor: pointer;
+            height: 180px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .dashboard-menu-item:hover {
+            transform: translateY(-10px);
+            background: var(--card-hover);
+            border-color: var(--primary-color);
+            box-shadow: 0 8px 20px rgba(244, 162, 97, 0.3);
+        }
+
+        .dashboard-menu-item a {
+            color: var(--primary-color);
+            text-decoration: none;
+            display: block;
+            width: 100%;
+            height: 100%;
+            transition: color 0.2s;
+        }
+
+        .dashboard-menu-item a:hover {
+            color: #ffffff;
+        }
+
+        .dashboard-menu-item i {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            color: var(--primary-color);
+        }
+
+        /* Панель последних действий */
+        .recent-actions {
+            background: var(--secondary-color);
+            border-radius: 12px;
+            padding: 25px;
+            margin: 0 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .recent-actions h2 {
+            color: var(--primary-color);
+            margin-top: 0;
+            font-size: 1.5rem;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .recent-actions ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .recent-actions li {
+            padding: 15px 0;
+            border-bottom: 1px solid var(--border-color);
+            color: #b0b0b0;
+        }
+
+        .recent-actions li:last-child {
+            border-bottom: none;
+        }
+
+        .recent-actions li a {
+            color: var(--text-color);
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .recent-actions li a:hover {
+            color: var(--primary-color);
+            text-decoration: underline;
+        }
+
+        /* Панель задач */
+        .kanban-board {
+            display: flex;
+            gap: 25px;
+            padding: 25px;
+            background: var(--secondary-color);
+            min-height: 80vh;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            margin-top: 30px;
+        }
+
+        .kanban-column {
+            flex: 1;
+            background: var(--background-color);
+            border-radius: 12px;
+            padding: 25px;
+            min-width: 280px;
+            border: 1px solid var(--border-color);
+        }
+
+        .kanban-column h3 {
+            color: var(--primary-color);
+            margin-top: 0;
+            font-size: 1.4rem;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .kanban-column h3 i {
+            font-size: 1.1rem;
+            color: #aaa;
+        }
+
+        .kanban-task {
+            background: var(--secondary-color);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 18px;
+            cursor: move;
+            transition: all 0.2s;
+            border-left: 4px solid var(--primary-color);
+            box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+        }
+
+        .kanban-task:hover {
+            background: var(--card-hover);
+            transform: translateX(5px);
+            box-shadow: 0 5px 12px rgba(0,0,0,0.3);
+        }
+
+        .kanban-task h4 {
+            color: #ffffff;
+            margin-top: 0;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .kanban-task p {
+            color: #cccccc;
+            font-size: 0.95rem;
+            margin: 10px 0;
+            line-height: 1.4;
+        }
+
+        .task-status {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+
+        .status-new { background: #6c757d; color: white; }
+        .status-in-progress { background: #ffc107; color: #212529; }
+        .status-completed { background: #28a745; color: white; }
+        .status-cancelled { background: #dc3545; color: white; }
+
+        /* Кнопка добавления задачи */
+        .add-task-btn {
+            background: var(--primary-color);
+            color: #0a0a0a;
+            border: none;
+            border-radius: 10px;
+            padding: 15px;
+            font-weight: 600;
+            width: 100%;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: 20px;
+            font-size: 1.1rem;
+        }
+
+        .add-task-btn:hover {
+            background: #e09151;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(244, 162, 97, 0.3);
+        }
+
+        /* Форма задачи */
+        .task-form {
+            background: var(--secondary-color);
+            border-radius: 12px;
+            padding: 25px;
+            margin: 30px 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .task-form h2 {
+            color: var(--primary-color);
+            margin-top: 0;
+            font-size: 1.6rem;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #aaa;
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 12px 15px;
+            background: var(--background-color);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-color);
+            font-size: 1rem;
+            transition: all 0.2s;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(244, 162, 97, 0.2);
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            font-size: 1rem;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: #0a0a0a;
+        }
+
+        .btn-primary:hover {
+            background: #e09151;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: var(--border-color);
+            color: var(--text-color);
+        }
+
+        .btn-secondary:hover {
+            background: #444;
+        }
+
+        /* Стили для админ-панели */
+        .module {
+            background: none;
+            border: none;
+            box-shadow: none;
+            margin: 0;
+        }
+
+        .module h2 {
+            display: none;
+        }
+
+        .change-list {
+            background: none;
+            border: none;
+            padding: 0;
+            box-shadow: none;
+        }
+
+        .object-tools {
+            display: none;
+        }
+
+        /* Для форм */
+        form {
+            background: none;
+            border: none;
+            padding: 0;
+            box-shadow: none;
+        }
+
+        .form-row {
+            margin: 0;
+            padding: 0;
+            border: none;
+            background: none;
+        }
+
+        .form-row label {
+            font-weight: 500;
+            color: var(--text-color);
+        }
+
+        .form-row input,
+        .form-row textarea,
+        .form-row select {
+            background: var(--background-color);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-color);
+            padding: 12px 15px;
+            width: 100%;
+        }
+
+        .form-row input:focus,
+        .form-row textarea:focus,
+        .form-row select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(244, 162, 97, 0.2);
+        }
+
+        .submit-row {
+            background: var(--secondary-color);
+            padding: 20px 0;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .submit-row input {
+            padding: 12px 30px;
+            font-size: 1.1rem;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .submit-row input[type="submit"] {
+            background: var(--primary-color);
+            color: #0a0a0a;
+            font-weight: 600;
+        }
+
+        .submit-row input[type="submit"]:hover {
+            background: #e09151;
+            transform: translateY(-2px);
+        }
+
+        .submit-row input[type="button"] {
+            background: var(--border-color);
+            color: var(--text-color);
+            font-weight: 600;
+        }
+
+        .submit-row input[type="button"]:hover {
+            background: #444;
+        }
+
+        /* Для сообщений */
+        .messagelist {
+            background: var(--secondary-color);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+            border: 1px solid var(--border-color);
+        }
+
+        .messagelist li {
+            color: var(--text-color);
+            padding: 10px 0;
+        }
+
+        /* Для таблиц */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        table th {
+            background: var(--secondary-color);
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-color);
+        }
+
+        table td {
+            padding: 15px;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-color);
+        }
+
+        table tr:hover {
+            background: var(--card-hover);
+        }
+
+        /* Для пагинации */
+        .paginator {
+            display: flex;
+            justify-content: center;
+            margin: 30px 0;
+            gap: 10px;
+        }
+
+        .paginator a {
+            padding: 8px 15px;
+            background: var(--secondary-color);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            color: var(--text-color);
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .paginator a:hover {
+            background: var(--primary-color);
+            color: #0a0a0a;
+        }
+
+        .paginator .this-page {
+            background: var(--primary-color);
+            color: #0a0a0a;
+            font-weight: 600;
+        }
+
+        /* Для фильтров */
+        .filter {
+            background: var(--secondary-color);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+            border: 1px solid var(--border-color);
+        }
+
+        .filter h3 {
+            color: var(--primary-color);
+            margin-top: 0;
+            font-size: 1.2rem;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .filter ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .filter li {
+            padding: 10px 0;
+        }
+
+        .filter li a {
+            color: var(--text-color);
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .filter li a:hover {
+            color: var(--primary-color);
+        }
+
+        .filter li.selected a {
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        /* Для навигации */
+        .breadcrumbs {
+            background: var(--background-color);
+            padding: 15px 30px;
+            margin-bottom: 30px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .breadcrumbs a {
+            color: var(--text-color);
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .breadcrumbs a:hover {
+            color: var(--primary-color);
+        }
+
+        .breadcrumbs li:not(:last-child)::after {
+            content: " > ";
+            margin: 0 5px;
+            color: #aaa;
+        }
+
+        .breadcrumbs li:last-child {
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        /* Для ошибок */
+        .errornote {
+            color: #dc3545;
+            background: rgba(220, 53, 69, 0.1);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        /* Для пустых страниц */
+        .empty-message {
+            text-align: center;
+            padding: 50px 0;
+            color: #aaa;
+        }
+
+        .empty-message i {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            color: #444;
+        }
+
+        .empty-message h3 {
+            color: var(--text-color);
+            margin: 0 0 10px;
+            font-size: 1.5rem;
+        }
+
+         .dashboard-menu-item {
+        /* ... существующие стили ... */
+        cursor: pointer;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        }
+
+        .dashboard-menu-item a {
+            display: block;
+            width: 100%;
+            height: 100%;
+            text-decoration: none;
+        }
+
+        /* Для загрузки */
+        .loading {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .loading.active {
+            display: flex;
+        }
+
+        .loading-spinner {
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid var(--primary-color);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="{% if is_popup %}popup {% endif %}{% block bodyclass %}{% endblock %}">
+<!-- Верхняя панель -->
+<div id="header">
+    <div id="branding">
+        <h1>ATLANTIS Администрирование</h1>
+    </div>
+    <div id="user-tools">
+        <a href="/" target="_blank"><i class="fas fa-external-link-alt"></i> Открыть сайт</a>
+        {% if user.is_authenticated %}
+        <a href="{% url 'admin:password_change' %}"><i class="fas fa-key"></i> Изменить пароль</a>
+        <a href="{% url 'admin:logout' %}"><i class="fas fa-sign-out-alt"></i> Выйти</a>
+        <div class="user">
+            <i class="fas fa-user-circle" style="font-size: 28px;"></i>
+            <span>Добро пожаловать, {{ user.username }}</span>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Основное содержимое -->
+<div id="content">
+    {% block breadcrumbs %}{% endblock %}
+
+    {% if messages %}
+    <ul class="messagelist">
+        {% for message in messages %}
+        <li>{{ message }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+
+    {% block content %}{% endblock %}
+
+    {% block sidebar %}{% endblock %}
+
+    <div class="clear"></div>
+</div>
+
+<!-- Загрузка -->
+<div class="loading">
+    <div class="loading-spinner"></div>
+</div>
+
+
+
+<!-- Скрипты -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Инициализируем сортировку для каждой колонки
+        const columns = document.querySelectorAll('.kanban-column');
+        columns.forEach(column => {
+            new Sortable(column, {
+                group: 'tasks',
+                animation: 200,
+                onEnd: function(evt) {
+                    const taskId = evt.item.dataset.taskId;
+                    const newStatus = evt.to.id;
+
+                    // Показываем индикатор загрузки
+                    document.querySelector('.loading').classList.add('active');
+
+                    // Отправляем AJAX-запрос для обновления статуса
+                    fetch(`/admin/tasks/task/${taskId}/change-status/`, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRFToken': '{{ csrf_token }}',
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ status: newStatus })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        document.querySelector('.loading').classList.remove('active');
+                        if (!data.success) {
+                            alert('Ошибка при обновлении статуса');
+                        }
+                    })
+                    .catch(error => {
+                        document.querySelector('.loading').classList.remove('active');
+                        console.error('Ошибка:', error);
+                        alert('Произошла ошибка при обновлении статуса');
+                    });
+                }
+            });
+        });
+
+        // Добавление новой задачи
+        document.querySelectorAll('.add-task-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const title = prompt('Введите заголовок задачи:');
+                if (title) {
+                    // Показываем индикатор загрузки
+                    document.querySelector('.loading').classList.add('active');
+
+                    // Создаем новую задачу через API
+                    fetch('/admin/tasks/task/add/', {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRFToken': '{{ csrf_token }}',
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            title: title,
+                            description: '',
+                            status: 'new',
+                            assigned_to: {{ user.id }}
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        document.querySelector('.loading').classList.remove('active');
+                        if (data.success) {
+                            // Перезагружаем страницу или обновляем доску
+                            window.location.reload();
+                        } else {
+                            alert('Ошибка при создании задачи');
+                        }
+                    })
+                    .catch(error => {
+                        document.querySelector('.loading').classList.remove('active');
+                        console.error('Ошибка:', error);
+                        alert('Произошла ошибка при создании задачи');
+                    });
+                }
+            });
+        });
+
+        // Скрытие панели последних действий при навигации
+        document.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', function() {
+                document.querySelector('.recent-actions').style.display = 'none';
+            });
+        });
+    });
+
+
+.recent-actions-title {
+    color: var(--primary-color);
+    margin-top: 0;
+    font-size: 1.6rem;
+    padding-bottom: 15px;
+    border-bottom: 1px solid var(--border-color);
+    text-align: center;
+}
+
+.recent-actions-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 15px;
+}
+
+.recent-actions-item {
+    padding: 15px;
+    border-radius: 10px;
+    background: var(--background-color);
+    border: 1px solid var(--border-color);
+    transition: all 0.2s;
+}
+
+.recent-actions-item:hover {
+    background: var(--card-hover);
+    transform: translateY(-3px);
+    box-shadow: 0 5px 10px rgba(0,0,0,0.2);
+}
+
+.recent-actions-item a {
+    color: var(--text-color);
+    text-decoration: none;
+    display: block;
+    width: 100%;
+    height: 100%;
+    transition: all 0.2s;
+}
+
+.recent-actions-item a:hover {
+    color: var(--primary-color);
+    text-decoration: none;
+}
+
+.action-text {
+    font-size: 1.1rem;
+    display: block;
+    margin-top: 8px;
+    line-height: 1.4;
+}
+    /* Стили для продуктов */
+.product-list {
+    background: var(--secondary-color);
+    border-radius: 12px;
+    padding: 25px;
+    margin: 20px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+
+.product-list-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+.product-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 25px;
+}
+
+.product-card {
+    background: var(--background-color);
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid var(--border-color);
+    transition: all 0.3s;
+}
+
+.product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+}
+
+.product-image {
+    height: 200px;
+    background: var(--secondary-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.product-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s;
+}
+
+.product-image:hover img {
+    transform: scale(1.05);
+}
+
+.product-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #aaa;
+    font-size: 1.2rem;
+}
+
+.product-info {
+    padding: 20px;
+}
+
+.product-price {
+    font-size: 1.2rem;
+    color: var(--primary-color);
+    font-weight: 600;
+}
+
+.product-price span {
+    font-size: 1.4rem;
+}
+
+.product-category {
+    color: #aaa;
+    margin: 8px 0;
+}
+
+.product-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+/* Для заказов */
+.order-list {
+    background: var(--secondary-color);
+    border-radius: 12px;
+    padding: 25px;
+    margin: 20px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+
+.order-card {
+    background: var(--background-color);
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 15px;
+    border-left: 4px solid var(--primary-color);
+}
+
+.order-card h3 {
+    color: var(--text-color);
+    margin-top: 0;
+}
+
+.order-details {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 15px;
+    margin: 15px 0;
+}
+
+.order-status {
+    padding: 8px 15px;
+    border-radius: 20px;
+    font-weight: 600;
+    display: inline-block;
+}
+
+
+/* Исправление для кнопок */
+.dashboard-menu {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* 3 колонки = 6 кнопок в 2 ряда */
+    gap: 25px;
+    padding: 30px;
+    max-width: 1200px;
+    margin: 0 auto 40px;
+}
+
+.dashboard-menu-item {
+    background: #1a1a1a;
+    border-radius: 15px;
+    padding: 35px 20px;
+    text-align: center;
+    color: #f4a261;
+    font-weight: 600;
+    font-size: 1.3rem;
+    transition: all 0.3s ease;
+    border: 1px solid #2d2d2d;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    cursor: pointer;
+    min-height: 220px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.dashboard-menu-item a {
+    color: #f4a261;
+    text-decoration: none;
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+.dashboard-menu-item i {
+    font-size: 3.5rem !important;
+    margin-bottom: 20px;
+    color: #f4a261;
+}
+
+.menu-text {
+    font-size: 1.4rem;
+    margin-top: 10px;
+}
+
+/* Исправление позиции "Последние действия" */
+.recent-actions {
+    max-width: 1000px;
+    margin: 20px auto 0 !important; /* Убираем лишний отступ сверху */
+    padding: 25px;
+    background: #1a1a1a;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+
+.status-pending { background: #ffc107; color: #212529; }
+.status-processing { background: #007bff; color: white; }
+.status-shipped { background: #17a2b8; color: white; }
+.status-delivered { background: #28a745; color: white; }
+.status-cancelled { background: #dc3545; color: white; }
+
+</script>
+</body>
+</html>
