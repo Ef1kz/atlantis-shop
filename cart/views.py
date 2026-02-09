@@ -9,6 +9,7 @@ from orders.models import Order, OrderItem
 
 @require_POST
 def cart_add(request, product_id):
+    """Добавление товара в корзину"""
     product = get_object_or_404(Product, id=product_id)
     cart = request.session.get('cart', {})
     cart = dict(cart)
@@ -29,7 +30,9 @@ def cart_add(request, product_id):
 
     return redirect('cart:detail')
 
+
 def cart_detail(request):
+    """Просмотр корзины"""
     cart = request.session.get('cart', {})
     print(">>> СЕССИЯ В КОРЗИНЕ:", cart)
 
@@ -56,13 +59,17 @@ def cart_detail(request):
         'total': total
     })
 
+
 def cart_count(request):
+    """Получение количества товаров в корзине (для AJAX)"""
     cart = request.session.get('cart', {})
     count = sum(item.get('quantity', 0) for item in cart.values())
     return JsonResponse({'count': count})
 
+
 @login_required
 def cart_checkout(request):
+    """Оформление заказа"""
     cart = request.session.get('cart', {})
     if not cart:
         return redirect('cart:detail')
@@ -71,10 +78,13 @@ def cart_checkout(request):
         address = request.POST.get('address', '')
         phone = request.POST.get('phone', '')
 
+        # Создаем заказ
         order = Order.objects.create(
             user=request.user,
             status='pending',
-            total_amount=0
+            total_amount=0,
+            delivery_address=address,
+            phone=phone
         )
 
         total = 0
@@ -98,6 +108,7 @@ def cart_checkout(request):
         order.total_amount = total
         order.save()
 
+        # Очищаем корзину
         request.session['cart'] = {}
         request.session.modified = True
 
@@ -105,9 +116,7 @@ def cart_checkout(request):
 
     return render(request, 'cart/checkout.html')
 
+
 def checkout_success(request):
+    """Страница успешного оформления заказа"""
     return render(request, 'cart/checkout_success.html')
-@never_cache  # ← ЗАПРЕЩАЕТ кэширование
-def user_orders(request):
-    orders = Order.objects.filter(user=request.user).order_by('-created_at')
-    return render(request, 'orders/user_orders.html', {'orders': orders})

@@ -28,7 +28,7 @@ def product_list_by_collection(request, collection_slug):
         from django.http import Http404
         raise Http404("Категория не найдена")
 
-    products = Product.objects.filter(collection=collection_name).order_by('-created_at')
+    products = Product.objects.filter(category__name=collection_name).order_by('-created_at')
     return render(request, 'products/list.html', {
         'products': products,
         'category_title': collection_name

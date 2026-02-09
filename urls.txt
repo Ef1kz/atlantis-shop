@@ -1,0 +1,90 @@
+/	core.views.home	home
+/accounts/login/	django.contrib.auth.views.LoginView	login
+/accounts/logout/	django.contrib.auth.views.LogoutView	logout
+/accounts/register/	accounts.views.register	register
+/admin/	atlantis.admin.index	atlantis_admin:index
+/admin/<app_label>/	django.contrib.admin.sites.app_index	atlantis_admin:app_list
+/admin/<url>	django.contrib.admin.sites.catch_all_view
+/admin/accounts/customuser/	django.contrib.admin.options.changelist_view	atlantis_admin:accounts_customuser_changelist
+/admin/accounts/customuser/<path:object_id>/	django.views.generic.base.RedirectView
+/admin/accounts/customuser/<path:object_id>/change/	django.contrib.admin.options.change_view	atlantis_admin:accounts_customuser_change
+/admin/accounts/customuser/<path:object_id>/delete/	django.contrib.admin.options.delete_view	atlantis_admin:accounts_customuser_delete
+/admin/accounts/customuser/<path:object_id>/history/	django.contrib.admin.options.history_view	atlantis_admin:accounts_customuser_history
+/admin/accounts/customuser/add/	django.contrib.admin.options.add_view	atlantis_admin:accounts_customuser_add
+/admin/autocomplete/	django.contrib.admin.sites.autocomplete_view	atlantis_admin:autocomplete
+/admin/cart/cart/	django.contrib.admin.options.changelist_view	atlantis_admin:cart_cart_changelist
+/admin/cart/cart/<path:object_id>/	django.views.generic.base.RedirectView
+/admin/cart/cart/<path:object_id>/change/	django.contrib.admin.options.change_view	atlantis_admin:cart_cart_change
+/admin/cart/cart/<path:object_id>/delete/	django.contrib.admin.options.delete_view	atlantis_admin:cart_cart_delete
+/admin/cart/cart/<path:object_id>/history/	django.contrib.admin.options.history_view	atlantis_admin:cart_cart_history
+/admin/cart/cart/add/	django.contrib.admin.options.add_view	atlantis_admin:cart_cart_add
+/admin/cart/cartitem/	django.contrib.admin.options.changelist_view	atlantis_admin:cart_cartitem_changelist
+/admin/cart/cartitem/<path:object_id>/	django.views.generic.base.RedirectView
+/admin/cart/cartitem/<path:object_id>/change/	django.contrib.admin.options.change_view	atlantis_admin:cart_cartitem_change
+/admin/cart/cartitem/<path:object_id>/delete/	django.contrib.admin.options.delete_view	atlantis_admin:cart_cartitem_delete
+/admin/cart/cartitem/<path:object_id>/history/	django.contrib.admin.options.history_view	atlantis_admin:cart_cartitem_history
+/admin/cart/cartitem/add/	django.contrib.admin.options.add_view	atlantis_admin:cart_cartitem_add
+/admin/jsi18n/	django.contrib.admin.sites.i18n_javascript	atlantis_admin:jsi18n
+/admin/login/	django.contrib.admin.sites.login	atlantis_admin:login
+/admin/logout/	django.contrib.admin.sites.logout	atlantis_admin:logout
+/admin/orders/order/	django.contrib.admin.options.changelist_view	atlantis_admin:orders_order_changelist
+/admin/orders/order/<path:object_id>/	django.views.generic.base.RedirectView
+/admin/orders/order/<path:object_id>/change/	django.contrib.admin.options.change_view	atlantis_admin:orders_order_change
+/admin/orders/order/<path:object_id>/delete/	django.contrib.admin.options.delete_view	atlantis_admin:orders_order_delete
+/admin/orders/order/<path:object_id>/history/	django.contrib.admin.options.history_view	atlantis_admin:orders_order_history
+/admin/orders/order/add/	django.contrib.admin.options.add_view	atlantis_admin:orders_order_add
+/admin/orders/orderitem/	django.contrib.admin.options.changelist_view	atlantis_admin:orders_orderitem_changelist
+/admin/orders/orderitem/<path:object_id>/	django.views.generic.base.RedirectView
+/admin/orders/orderitem/<path:object_id>/change/	django.contrib.admin.options.change_view	atlantis_admin:orders_orderitem_change
+/admin/orders/orderitem/<path:object_id>/delete/	django.contrib.admin.options.delete_view	atlantis_admin:orders_orderitem_delete
+/admin/orders/orderitem/<path:object_id>/history/	django.contrib.admin.options.history_view	atlantis_admin:orders_orderitem_history
+/admin/orders/orderitem/add/	django.contrib.admin.options.add_view	atlantis_admin:orders_orderitem_add
+/admin/password_change/	django.contrib.admin.sites.password_change	atlantis_admin:password_change
+/admin/password_change/done/	django.contrib.admin.sites.password_change_done	atlantis_admin:password_change_done
+/admin/products/category/	django.contrib.admin.options.changelist_view	atlantis_admin:products_category_changelist
+/admin/products/category/<path:object_id>/	django.views.generic.base.RedirectView
+/admin/products/category/<path:object_id>/change/	django.contrib.admin.options.change_view	atlantis_admin:products_category_change
+/admin/products/category/<path:object_id>/delete/	django.contrib.admin.options.delete_view	atlantis_admin:products_category_delete
+/admin/products/category/<path:object_id>/history/	django.contrib.admin.options.history_view	atlantis_admin:products_category_history
+/admin/products/category/add/	django.contrib.admin.options.add_view	atlantis_admin:products_category_add
+/admin/products/product/	django.contrib.admin.options.changelist_view	atlantis_admin:products_product_changelist
+/admin/products/product/<path:object_id>/	django.views.generic.base.RedirectView
+/admin/products/product/<path:object_id>/change/	django.contrib.admin.options.change_view	atlantis_admin:products_product_change
+/admin/products/product/<path:object_id>/delete/	django.contrib.admin.options.delete_view	atlantis_admin:products_product_delete
+/admin/products/product/<path:object_id>/history/	django.contrib.admin.options.history_view	atlantis_admin:products_product_history
+/admin/products/product/add/	django.contrib.admin.options.add_view	atlantis_admin:products_product_add
+/admin/r/<path:content_type_id>/<path:object_id>/	django.contrib.contenttypes.views.shortcut	atlantis_admin:view_on_site
+/admin/reviews/review/	django.contrib.admin.options.changelist_view	atlantis_admin:reviews_review_changelist
+/admin/reviews/review/<path:object_id>/	django.views.generic.base.RedirectView
+/admin/reviews/review/<path:object_id>/change/	django.contrib.admin.options.change_view	atlantis_admin:reviews_review_change
+/admin/reviews/review/<path:object_id>/delete/	django.contrib.admin.options.delete_view	atlantis_admin:reviews_review_delete
+/admin/reviews/review/<path:object_id>/history/	django.contrib.admin.options.history_view	atlantis_admin:reviews_review_history
+/admin/reviews/review/add/	django.contrib.admin.options.add_view	atlantis_admin:reviews_review_add
+/admin/tasks/task/	tasks.admin.changelist_view	atlantis_admin:tasks_task_changelist
+/admin/tasks/task/<int:task_id>/update_status/	tasks.admin.update_status	atlantis_admin:tasks_task_update_status
+/admin/tasks/task/<path:object_id>/	django.views.generic.base.RedirectView
+/admin/tasks/task/<path:object_id>/change/	django.contrib.admin.options.change_view	atlantis_admin:tasks_task_change
+/admin/tasks/task/<path:object_id>/delete/	django.contrib.admin.options.delete_view	atlantis_admin:tasks_task_delete
+/admin/tasks/task/<path:object_id>/history/	django.contrib.admin.options.history_view	atlantis_admin:tasks_task_history
+/admin/tasks/task/add/	django.contrib.admin.options.add_view	atlantis_admin:tasks_task_add
+/admin/tasks/taskcomment/	django.contrib.admin.options.changelist_view	atlantis_admin:tasks_taskcomment_changelist
+/admin/tasks/taskcomment/<path:object_id>/	django.views.generic.base.RedirectView
+/admin/tasks/taskcomment/<path:object_id>/change/	django.contrib.admin.options.change_view	atlantis_admin:tasks_taskcomment_change
+/admin/tasks/taskcomment/<path:object_id>/delete/	django.contrib.admin.options.delete_view	atlantis_admin:tasks_taskcomment_delete
+/admin/tasks/taskcomment/<path:object_id>/history/	django.contrib.admin.options.history_view	atlantis_admin:tasks_taskcomment_history
+/admin/tasks/taskcomment/add/	django.contrib.admin.options.add_view	atlantis_admin:tasks_taskcomment_add
+/api/cart/add/	api.views.api_cart_add	api_cart_add
+/api/orders/create/	api.views.api_order_create	api_order_create
+/api/products/	api.views.api_products	api_products
+/cart/	cart.views.cart_detail	cart:detail
+/cart/add/<int:product_id>/	cart.views.cart_add	cart:add
+/cart/checkout/	cart.views.cart_checkout	cart:checkout
+/cart/checkout/success/	cart.views.checkout_success	cart:checkout_success
+/cart/count/	cart.views.cart_count	cart:count
+/media/<path>	django.views.static.serve
+/orders/my/	orders.views.user_orders	orders:user_orders
+/products/	products.views.product_list	products:product_list
+/products/<int:pk>/	products.views.product_detail	products:product_detail
+/products/<slug:collection_slug>/	products.views.product_list_by_collection	products:product_list_by_collection
+/static/<path>	django.views.static.serve
+/tasks/task/<int:task_id>/update_status/	tasks.views.update_task_status	tasks:tasks_task_update_status

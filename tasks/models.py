@@ -1,62 +1,29 @@
-# tasks/models.py
 from django.db import models
-from django.contrib.auth.models import User
-from django.utils import timezone
-from orders.models import Order  # Импортируем из существующего приложения
-
-class TaskStatus(models.TextChoices):
-    NEW = 'new', 'Новая'
-    IN_PROGRESS = 'in_progress', 'В работе'
-    COMPLETED = 'completed', 'Завершена'
-    CANCELLED = 'cancelled', 'Отменена'
-
-class TaskPriority(models.TextChoices):
-    LOW = 'low', 'Низкий'
-    MEDIUM = 'medium', 'Средний'
-    HIGH = 'high', 'Высокий'
-    CRITICAL = 'critical', 'Критический'
+from django.conf import settings
 
 class Task(models.Model):
-    title = models.CharField('Заголовок', max_length=255)
-    description = models.TextField('Описание')
-    status = models.CharField(
-        'Статус',
-        max_length=20,
-        choices=TaskStatus.choices,
-        default=TaskStatus.NEW
-    )
-    priority = models.CharField(
-        'Приоритет',
-        max_length=20,
-        choices=TaskPriority.choices,
-        default=TaskPriority.MEDIUM
-    )
-    assigned_to = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        related_name='assigned_tasks',
-        verbose_name='Назначена'
-    )
-    created_by = models.ForeignKey(
-        User,
-        on_delete=models.SET_NULL,
-        null=True,
-        related_name='created_tasks',
-        verbose_name='Создана'
-    )
-    created_at = models.DateTimeField('Создана', auto_now_add=True)
-    updated_at = models.DateTimeField('Обновлена', auto_now=True)
-    due_date = models.DateTimeField('Срок выполнения', null=True, blank=True)
-    completed_at = models.DateTimeField('Завершена', null=True, blank=True)
+    STATUS_CHOICES = [
+        ('todo', 'К выполнению'),
+        ('in_progress', 'В работе'),
+        ('review', 'На проверке'),
+        ('done', 'Выполнено'),
+        ('cancelled', 'Отменено'),
+    ]
+    PRIORITY_CHOICES = [
+        ('low', 'Низкий'),
+        ('medium', 'Средний'),
+        ('high', 'Высокий'),
+    ]
 
-    # Связь с заказами
-    order = models.ForeignKey(
-        Order,
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-        verbose_name='Заказ'
-    )
+    title = models.CharField(max_length=200, verbose_name='Название')
+    description = models.TextField(verbose_name='Описание', blank=True)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='todo', verbose_name='Статус')
+    priority = models.CharField(max_length=10, choices=PRIORITY_CHOICES, default='medium', verbose_name='Приоритет')
+    due_date = models.DateField(verbose_name='Срок выполнения', null=True, blank=True)
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='created_tasks', verbose_name='Создатель')
+    assigned_to = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name='assigned_tasks', verbose_name='Исполнитель')
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name='Создано')
+    updated_at = models.DateTimeField(auto_now=True, verbose_name='Обновлено')
 
     class Meta:
         verbose_name = 'Задача'
@@ -64,18 +31,16 @@ class Task(models.Model):
         ordering = ['-created_at']
 
     def __str__(self):
-        return f"{self.title} - {self.get_status_display()}"
+        return self.title
 
 class TaskComment(models.Model):
-    task = models.ForeignKey(Task, on_delete=models.CASCADE, related_name='comments')
-    author = models.ForeignKey(User, on_delete=models.CASCADE)
-    text = models.TextField('Комментарий')
-    created_at = models.DateTimeField('Создан', auto_now_add=True)
+    task = models.ForeignKey(Task, on_delete=models.CASCADE, related_name='comments', verbose_name='Задача')
+    author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, verbose_name='Автор')
+    content = models.TextField(verbose_name='Текст комментария')
+    attachment = models.FileField(upload_to='task_comments/', null=True, blank=True, verbose_name='Вложение')
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name='Дата добавления')
 
     class Meta:
         verbose_name = 'Комментарий'
         verbose_name_plural = 'Комментарии'
-        ordering = ['created_at']
-
-    def __str__(self):
-        return f"Комментарий от {self.author.username}"
+        ordering = ['-created_at'] # Последние сверху

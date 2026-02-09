@@ -1,30 +1,513 @@
-{% extends "admin/base.html" %}
-{% load static %}
+{% extends "admin/base_site.html" %}
+{% load static admin_urls admin_list %}
 
-{% block title %}Корпоративные задачи{% endblock %}
+{% block extrahead %}
+{{ block.super }}
+<meta name="csrf-token" content="{{ csrf_token }}">
+<style>
+    /* 1. Глобальный макет для Kanban */
+    {% if current_view == 'kanban' %}
+    html, body { height: 100%; overflow: hidden; background: #0a0a0a; }
+    #container { height: 100%; display: flex; flex-direction: column; }
+    #content { flex: 1; display: flex; flex-direction: column; padding: 0 !important; overflow: hidden; }
+    #content h1 { display: none; }
+    {% endif %}
+
+    .kanban-wrapper { display: flex; flex-direction: column; height: 100%; background: #0f0f0f; }
+
+    .kanban-board {
+        display: flex; gap: 20px; padding: 20px;
+        overflow-x: auto; flex: 1; align-items: flex-start;
+    }
+
+    /* 2. Колонки */
+    .kanban-col {
+        min-width: 295px; width: 295px; flex-shrink: 0;
+        background: #161616; border-radius: 12px;
+        display: flex; flex-direction: column;
+        max-height: calc(100vh - 140px); border: 1px solid #252525;
+    }
+
+    .col-header {
+        padding: 15px 20px; background: #1e1e1e; border-radius: 12px 12px 0 0;
+        display: flex; justify-content: space-between; border-bottom: 2px solid #333;
+    }
+
+    .kanban-tasks { padding: 12px; overflow-y: auto; flex: 1; min-height: 100px; }
+
+    /* 3. Дизайн карточек */
+    .task-card {
+        background: #222; margin-bottom: 12px; padding: 16px; border-radius: 10px;
+        cursor: grab; border: 1px solid #333; transition: all 0.2s ease;
+        position: relative; box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+    }
+
+    .task-card:hover { transform: translateY(-3px); border-color: #f4a261; box-shadow: 0 8px 15px rgba(244, 162, 97, 0.1); }
+
+    .priority-badge {
+        display: inline-block; padding: 2px 8px; border-radius: 4px;
+        font-size: 10px; font-weight: 800; text-transform: uppercase; margin-bottom: 8px;
+    }
+    .badge-high { background: #e63946; color: #fff; }
+    .badge-medium { background: #f4a261; color: #fff; }
+    .badge-low { background: #2a9d8f; color: #fff; }
+
+    .task-title { font-weight: 600; color: #fff; font-size: 15px; margin-bottom: 10px; }
+    .task-footer { display: flex; justify-content: space-between; font-size: 11px; color: #888; border-top: 1px solid #333; padding-top: 10px; }
+
+    /* 4. Модальное окно и поля */
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 9999;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.85);
+        backdrop-filter: blur(4px);
+        overflow-y: auto;  /* Важно: позволяет скроллить весь модал */
+        padding: 20px 0;   /* отступы сверху/снизу для мобильных */
+    }
+    .modal-content {
+        background: #1a1a1a;
+        color: white;
+        padding: 30px;
+        border-radius: 15px;
+        max-width: 620px;
+        margin: 0 auto;  /* центрирование */
+        border: 1px solid #333;
+        max-height: 90vh;  /* ограничиваем высоту */
+        overflow-y: auto;  /* внутренний скролл контента */
+        display: flex;
+        flex-direction: column;
+    }
+
+    .modal-buttons {
+            margin-top: auto;  /* прижимает к низу */
+            padding-top: 20px;
+            border-top: 1px solid #333;
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+            position: sticky;
+            bottom: 0;
+            background: #1a1a1a;  /* фон как у модала */
+            padding: 15px 0;
+        }
+
+    .modal-content select, .modal-content input, .modal-content textarea {
+        width: 100% !important; box-sizing: border-box !important;
+        background: #252525; border: 1px solid #444; color: white;
+        padding: 10px 12px; border-radius: 6px; margin-top: 5px; font-size: 14px; min-height: 42px;
+    }
+
+    .modal-content textarea { min-height: 80px; resize: vertical; }
+
+    .fields-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-top: 15px; }
+
+    .field-group { display: flex; flex-direction: column; }
+    .field-group label { font-size: 11px; color: #aaa; text-transform: uppercase; margin-bottom: 2px; }
+
+    .file-attach { display: flex; align-items: center; margin-top: 10px; gap: 10px; color: #aaa; }
+    .file-attach input { flex: 1; background: none; border: none; color: white; }
+
+    .comments-section { margin-top: 30px; border-top: 1px solid #333; padding-top: 15px; max-height: 300px; overflow-y: auto; }
+    .comments-section h4 { font-size: 13px; color: #f4a261; text-transform: uppercase; margin-bottom: 15px; }
+    .comment-item { background: #252525; padding: 12px; border-radius: 8px; margin-bottom: 12px; border: 1px solid #333; }
+    .comment-header { display: flex; justify-content: space-between; font-size: 11px; color: #888; margin-bottom: 8px; }
+    .comment-text { font-size: 13px; color: #ddd; white-space: pre-wrap; }
+    .comment-file { margin-top: 8px; font-size: 11px; color: #f4a261; display: block; text-decoration: none; }
+    .comment-file:hover { text-decoration: underline; }
+
+    .notify {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: #28a745;           /* яркий зелёный (Bootstrap success) */
+        color: white;
+        padding: 14px 28px;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(40, 167, 69, 0.4);
+        opacity: 0;
+        transition: opacity 0.4s ease, transform 0.3s ease;
+        z-index: 9999;
+        font-weight: bold;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        min-width: 240px;
+        transform: translateY(-20px);
+    }
+
+    .notify::before {
+        content: "✓";
+        font-size: 20px;
+    }
+
+    .notify.show {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    .modal-content input[type="submit"] {
+        background: #f4a261 !important;
+        color: #000 !important;
+        font-weight: bold !important;
+        border: none !important;
+        padding: 10px 20px !important;
+        border-radius: 6px !important;
+        cursor: pointer;
+    }
+
+    .modal-content input[type="submit"]:hover {
+        opacity: 0.9;
+    }
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="breadcrumbs">
-    <ul>
-        <li><a href="/admin/">Главная</a></li>
-        <li><a href="/admin/tasks/task/">Корпоративные задачи</a></li>
-        <li>Доска задач</li>
-    </ul>
-</div>
-
-<div class="kanban-board">
-    {% for status, tasks in tasks_by_status.items %}
-    <div class="kanban-column" id="{{ status }}">
-        <h3>{{ status|title }} <i class="fas fa-chevron-down"></i></h3>
-        {% for task in tasks %}
-        <div class="kanban-task" data-task-id="{{ task.id }}">
-            <h4>{{ task.title }}</h4>
-            <p>{{ task.description|truncatechars:80 }}</p>
-            <span class="task-status status-{{ task.status }}">{{ task.get_status_display }}</span>
+{% if current_view == 'kanban' %}
+<div class="kanban-wrapper">
+    <div class="kanban-board">
+        {% for status, data in tasks_by_status.items %}
+        <div class="kanban-col" data-status="{{ status }}">
+            <div class="col-header">
+                <span style="font-weight: bold; color: #fff;">{{ data.label }}</span>
+                <span style="background: #2d2d2d; padding: 2px 8px; border-radius: 10px; font-size: 12px; color: #aaa;">{{ data.count }}</span>
+            </div>
+            <div class="kanban-tasks">
+                {% for task in data.tasks %}
+                <div class="task-card" data-id="{{ task.id }}" draggable="true" onclick="openEditModal({{ task.id }})">
+                    <div class="priority-badge badge-{{ task.priority }}">{{ task.get_priority_display }}</div>
+                    <div class="task-title">{{ task.title }}</div>
+                    <div class="task-footer">
+                        <span>🧑 {{ task.assigned_to.username|default:"Не назначен" }}</span>
+                        <span>📅 {{ task.due_date|date:"d.m.Y"|default:"Не указан" }}</span>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
         </div>
         {% endfor %}
-        <button class="add-task-btn">Добавить задачу</button>
     </div>
-    {% endfor %}
 </div>
+
+<!-- Edit Modal -->
+<div id="editModal" class="modal">
+    <div class="modal-content">
+        <form id="editForm" enctype="multipart/form-data">
+            <input type="hidden" id="m_id">
+            <input type="text" id="m_title" placeholder="Заголовок" required>
+            <textarea id="m_desc" placeholder="Описание..." rows="3" style="margin-top:10px;"></textarea>
+
+            <div class="fields-grid">
+                <div class="field-group"><label>Статус</label>
+                    <select id="m_status">{% for v, l in status_choices %}<option value="{{v}}">{{l}}</option>{% endfor %}</select>
+                </div>
+                <div class="field-group"><label>Исполнитель</label>
+                    <select id="m_user"><option value="">-- Не назначен --</option>{% for u in users_list %}<option value="{{u.id}}">{{u.username}}</option>{% endfor %}</select>
+                </div>
+                <div class="field-group"><label>Приоритет</label>
+                    <select id="m_priority">{% for v, l in priority_choices %}<option value="{{v}}">{{l}}</option>{% endfor %}</select>
+                </div>
+                <div class="field-group"><label>Срок</label>
+                    <input type="date" id="m_date">
+                </div>
+            </div>
+
+            <div id="comments-section" class="comments-section"></div>
+
+            <div style="margin-top:20px; border-top:1px solid #333; padding-top:15px;">
+                <label style="font-size:11px; color:#f4a261; text-transform:uppercase;">Новый комментарий + файл</label>
+                <textarea id="m_new_comment" placeholder="Комментарий..." style="height:60px; min-height:60px;"></textarea>
+                <div class="file-attach">
+                    <span style="font-size:16px;">📎</span>
+                    <input type="file" id="m_file">
+                </div>
+            </div>
+
+            <div class="modal-buttons">
+                <button type="button" onclick="closeEditModal()" style="background:none; border:1px solid #444; color:#aaa; padding:10px 20px; border-radius:6px;">Отмена</button>
+                <input type="submit" value="Сохранить" style="background:#f4a261; color:white; border:none; padding:10px 30px; border-radius:6px; font-weight:bold;">
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Create Modal -->
+<div id="createModal" class="modal">
+    <div class="modal-content">
+        <form id="createForm" enctype="multipart/form-data">
+            <h3 style="margin:0 0 15px 0; color:#f4a261;">Создать новую задачу</h3>
+
+            <input type="text" id="c_title" placeholder="Заголовок" required>
+            <textarea id="c_desc" placeholder="Описание..." rows="2" style="margin-top:10px;"></textarea>
+
+            <div class="fields-grid">
+                <div class="field-group"><label>Статус</label>
+                    <select id="c_status">{% for v, l in status_choices %}<option value="{{v}}">{{l}}</option>{% endfor %}</select>
+                </div>
+                <div class="field-group"><label>Исполнитель</label>
+                    <select id="c_user"><option value="">-- Не назначен --</option>{% for u in users_list %}<option value="{{u.id}}">{{u.username}}</option>{% endfor %}</select>
+                </div>
+                <div class="field-group"><label>Приоритет</label>
+                    <select id="c_priority">{% for v, l in priority_choices %}<option value="{{v}}">{{l}}</option>{% endfor %}</select>
+                </div>
+                <div class="field-group"><label>Срок</label>
+                    <input type="date" id="c_date">
+                </div>
+            </div>
+
+            <div style="margin-top:20px; border-top:1px solid #333; padding-top:15px;">
+                <label style="font-size:11px; color:#f4a261; text-transform:uppercase;">Начальный комментарий + файл</label>
+                <textarea id="c_new_comment" placeholder="Комментарий..." style="height:50px; min-height:50px;"></textarea>
+                <div class="file-attach">
+                    <span style="font-size:16px;">📎</span>
+                    <input type="file" id="c_file">
+                </div>
+            </div>
+
+            <div class="modal-buttons">
+                <button type="button" onclick="closeCreateModal()" style="background:none; border:1px solid #444; color:#aaa; padding:10px 20px; border-radius:6px;">Отмена</button>
+                <button type="submit" style="background:#f4a261; color:white; border:none; padding:10px 30px; border-radius:6px; font-weight:bold;">Создать задачу</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Notify -->
+<div id="notify" class="notify"></div>
+
+<!-- Кнопка создания задачи -->
+<div style="position: fixed; bottom: 20px; right: 20px; z-index: 999;">
+    <a href="#" onclick="openCreateModal()" style="background:#f4a261; padding: 12px 25px; border-radius: 50px; color:white; text-decoration:none; font-weight:bold; box-shadow: 0 4px 10px rgba(244,162,97,0.3);">+ Новая задача</a>
+</div>
+
+<script>
+    function getCsrf() {
+        return document.querySelector('meta[name="csrf-token"]').content;
+    }
+
+            function showNotify(msg) {
+            const notify = document.getElementById('notify');
+            notify.textContent = msg;
+            notify.classList.remove('show');  // сброс
+            void notify.offsetWidth;          // reflow для перезапуска анимации
+            notify.classList.add('show');
+            setTimeout(() => notify.classList.remove('show'), 4000);
+        }
+
+    // ==================== EDIT MODAL ====================
+    function openEditModal(id) {
+        document.getElementById('editModal').style.display = 'block';
+        document.getElementById('m_id').value = id;
+
+        fetch(`${id}/detail/`, {
+            method: 'GET',
+            headers: {'X-CSRFToken': getCsrf()}
+        })
+        .then(r => r.json())
+        .then(res => {
+            if (res.success) {
+                const t = res.task;
+                document.getElementById('m_title').value = t.title;
+                document.getElementById('m_desc').value = t.description;
+                document.getElementById('m_status').value = t.status;
+                document.getElementById('m_user').value = t.assigned_to || '';
+                document.getElementById('m_priority').value = t.priority;
+                document.getElementById('m_date').value = t.due_date || '';
+
+                // Комментарии — ИСПРАВЛЕНО: правильные ключи из JSON
+                const commentsSection = document.getElementById('comments-section');
+                commentsSection.innerHTML = '<h4>Комментарии</h4>';
+                if (t.comments.length === 0) {
+                    commentsSection.innerHTML += '<p style="color:#888; font-style:italic;">Нет комментариев</p>';
+                } else {
+                    t.comments.forEach(c => {
+                        let html = `<div class="comment-item">
+                            <div class="comment-header">
+                                <span>${c.author}</span>
+                                <span>${c.date}</span>
+                            </div>
+                            <div class="comment-text">${c.text || ''}</div>`;
+                        if (c.file_url) {
+                            html += `<a href="${c.file_url}" target="_blank" class="comment-file">📎 Вложение: ${c.file_name || 'файл'}</a>`;
+                        }
+                        html += '</div>';
+                        commentsSection.innerHTML += html;
+                    });
+                }
+            } else {
+                alert('Ошибка загрузки данных задачи');
+            }
+        })
+        .catch(err => {
+            console.error('Fetch error:', err);
+            alert('Ошибка соединения');
+        });
+    }
+
+    function closeEditModal() {
+        document.getElementById('editModal').style.display = 'none';
+        document.getElementById('m_new_comment').value = '';
+        document.getElementById('m_file').value = '';
+    }
+
+    document.getElementById('editForm').onsubmit = function(e) {
+        e.preventDefault();
+        const id = document.getElementById('m_id').value;
+        const fd = new FormData();
+
+        fd.append('title', document.getElementById('m_title').value);
+        fd.append('description', document.getElementById('m_desc').value);
+        fd.append('status', document.getElementById('m_status').value);
+        fd.append('assigned_to', document.getElementById('m_user').value);
+        fd.append('priority', document.getElementById('m_priority').value);
+        fd.append('due_date', document.getElementById('m_date').value);
+        fd.append('new_comment', document.getElementById('m_new_comment').value);
+
+        const fileInput = document.getElementById('m_file');
+        if (fileInput.files[0]) {
+            fd.append('comment_file', fileInput.files[0]);
+        }
+
+        fetch(`${id}/save_modal/`, {
+            method: 'POST',
+            body: fd,
+            headers: {'X-CSRFToken': getCsrf()}
+        })
+        .then(response => response.json())
+        .then(res => {
+            if (res.success) {
+                showNotify("Задача сохранена!");
+                closeEditModal();
+                setTimeout(() => location.reload(), 800);  // Даем время увидеть уведомление
+            } else {
+                alert("Ошибка сохранения: " + (res.error || 'неизвестно'));
+            }
+        })
+        .catch(err => {
+            console.error("Save error:", err);
+            alert("Не удалось сохранить задачу");
+        });
+    };
+
+    // ==================== CREATE MODAL ====================
+    function openCreateModal() {
+        // Сброс полей
+        document.getElementById('c_title').value = '';
+        document.getElementById('c_desc').value = '';
+        document.getElementById('c_status').value = 'todo';
+        document.getElementById('c_user').value = '';
+        document.getElementById('c_priority').value = 'medium';
+        document.getElementById('c_date').value = '';
+        document.getElementById('c_new_comment').value = '';
+        document.getElementById('c_file').value = '';
+        document.getElementById('createModal').style.display = 'block';
+    }
+
+    function closeCreateModal() {
+        document.getElementById('createModal').style.display = 'none';
+    }
+
+    document.getElementById('createForm').onsubmit = function(e) {
+        e.preventDefault();
+        const fd = new FormData();
+
+        fd.append('title', document.getElementById('c_title').value);
+        fd.append('description', document.getElementById('c_desc').value);
+        fd.append('status', document.getElementById('c_status').value);
+        fd.append('assigned_to', document.getElementById('c_user').value);
+        fd.append('priority', document.getElementById('c_priority').value);
+        fd.append('due_date', document.getElementById('c_date').value);
+        fd.append('new_comment', document.getElementById('c_new_comment').value);
+
+        const file = document.getElementById('c_file').files[0];
+        if (file) fd.append('comment_file', file);
+
+        fetch('create_modal/', {
+            method: 'POST',
+            body: fd,
+            headers: {'X-CSRFToken': getCsrf()}
+        })
+        .then(r => r.json())
+        .then(res => {
+            if (res.success) {
+                showNotify("Задача успешно создана!");
+                closeCreateModal();
+                setTimeout(() => location.reload(), 800);
+            } else {
+                alert("Ошибка создания: " + (res.error || 'неизвестно'));
+            }
+        })
+        .catch(err => {
+            console.error("Create error:", err);
+            alert("Ошибка соединения");
+        });
+    };
+
+    document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('.task-card').forEach(card => {
+            card.draggable = true;
+            card.ondragstart = e => {
+                e.dataTransfer.setData('text/plain', card.dataset.id);
+                card.style.opacity = '0.4';
+            };
+            card.ondragend = () => {
+                card.style.opacity = '1';
+            };
+        });
+
+        document.querySelectorAll('.kanban-tasks').forEach(tasksContainer => {
+            tasksContainer.ondragover = e => e.preventDefault();
+
+            tasksContainer.ondrop = e => {
+                e.preventDefault();
+
+                const id = e.dataTransfer.getData('text/plain');
+                if (!id) return;
+
+                const col = tasksContainer.closest('.kanban-col');
+                const status = col.dataset.status;
+                if (!status) return;
+
+                // ОТПРАВЛЯЕМ JSON, а не FormData (как требует views.py)
+                fetch(`${id}/update_status/`, {
+                    method: 'POST',
+                    body: JSON.stringify({ status: status }),
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCsrf()
+                    }
+                })
+                .then(response => {
+                    if (response.ok) {
+                        return response.json();
+                    } else {
+                        return response.json().then(err => { throw err; });
+                    }
+                })
+                .then(res => {
+                    if (res.success) {
+                        showNotify('Статус задачи обновлён!');
+                        setTimeout(() => location.reload(), 600);
+                    } else {
+                        alert('Ошибка: ' + (res.error || 'неизвестно'));
+                    }
+                })
+                .catch(err => {
+                    console.error('Ошибка при обновлении статуса:', err);
+                    alert('Ошибка обновления статуса');
+                });
+            };
+        });
+    });
+</script>
+{% else %}
+<div style="padding: 20px;">
+    <a href="?view=kanban" class="button" style="background:#f4a261">Вернуться на Kanban-доску</a>
+    {{ block.super }}
+</div>
+{% endif %}
 {% endblock %}

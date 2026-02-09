@@ -1,21 +1,17 @@
 # accounts/models.py
+from django.contrib.auth.models import AbstractUser
 from django.db import models
-from django.contrib.auth.models import User
 
-class UserProfile(models.Model):
-    ROLE_CHOICES = (
-        ('client', 'Клиент'),
-        ('designer', 'Дизайнер / B2B'),
-        ('manager', 'Менеджер'),
-        ('admin', 'Администратор'),
-    )
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
-    role = models.CharField("Роль", max_length=20, choices=ROLE_CHOICES, default='client')
-    phone = models.CharField("Телефон", max_length=20, blank=True)
+class CustomUser(AbstractUser):
+    phone = models.CharField(max_length=20, blank=True, null=True, verbose_name='Телефон')
+    address = models.CharField(max_length=255, blank=True, null=True, verbose_name='Адрес')
+
+    # Убедитесь, что у вас ЕСТЬ или НЕТ это поле:
+    # profile_picture = models.ImageField(upload_to='avatars/', blank=True, null=True)
 
     class Meta:
-        verbose_name = "Профиль пользователя"
-        verbose_name_plural = "Профили пользователей"
+        verbose_name = 'Пользователь'
+        verbose_name_plural = 'Пользователи'
 
     def __str__(self):
-        return f"{self.user.username} — {self.get_role_display()}"
+        return self.username

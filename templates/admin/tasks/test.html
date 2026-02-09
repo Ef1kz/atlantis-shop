@@ -1,0 +1,307 @@
+<!-- tasks/templates/tasks/test.html -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тест AJAX запросов</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+        }
+        .buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        button {
+            padding: 10px 20px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background: #45a049;
+        }
+        #result {
+            background: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 15px;
+            margin-top: 20px;
+            white-space: pre-wrap;
+            font-family: monospace;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .test-case {
+            margin: 20px 0;
+            padding: 15px;
+            background: #f0f0f0;
+            border-radius: 5px;
+        }
+        .test-case h3 {
+            margin-top: 0;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>🛠 Тестирование AJAX запросов для Kanban</h1>
+
+    <div class="test-case">
+        <h3>1. Базовые тесты эндпоинтов:</h3>
+        <div class="buttons">
+            <button onclick="testGet()">✅ Test GET /tasks/test/</button>
+            <button onclick="testPostForm()">📝 Test POST FormData</button>
+            <button onclick="testPostJSON()">📊 Test POST JSON</button>
+        </div>
+    </div>
+
+    <div class="test-case">
+        <h3>2. Тест деталей задачи (task_detail):</h3>
+        <input type="number" id="taskId" placeholder="ID задачи" value="1" style="padding: 8px; margin-right: 10px;">
+        <button onclick="testTaskDetail()">🔍 Получить детали задачи</button>
+    </div>
+
+    <div class="test-case">
+        <h3>3. Тест обновления статуса (update_status):</h3>
+        <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 10px;">
+            <input type="number" id="updateTaskId" placeholder="ID задачи" value="1" style="padding: 8px;">
+            <select id="newStatus" style="padding: 8px;">
+                <option value="todo">К выполнению</option>
+                <option value="in_progress">В работе</option>
+                <option value="review">На проверке</option>
+                <option value="done">Выполнено</option>
+                <option value="cancelled">Отменено</option>
+            </select>
+            <button onclick="testUpdateStatus()">🔄 Обновить статус</button>
+        </div>
+        <small>Это эмулирует запрос при перетаскивании задачи в Kanban</small>
+    </div>
+
+    <div class="test-case">
+        <h3>4. Тест имитации Kanban drag-and-drop:</h3>
+        <button onclick="simulateKanbanDrag()">🎯 Имитация перетаскивания задачи</button>
+        <small>Точно такой же запрос как в реальном Kanban</small>
+    </div>
+
+    <h3>Результат:</h3>
+    <div id="result">Нажмите любую кнопку для тестирования...</div>
+
+    <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #ddd;">
+        <h3>🎯 Следующие шаги:</h3>
+        <ol>
+            <li>Сначала нажмите "Test GET /tasks/test/" - должно работать</li>
+            <li>Затем "Test POST FormData" - должно работать</li>
+            <li>Если POST работает, попробуйте "Имитация перетаскивания задачи"</li>
+            <li>Если что-то не работает, проверьте консоль браузера (F12 → Console)</li>
+            <li>И терминал Django (там будут логи)</li>
+        </ol>
+    </div>
+</div>
+
+<script>
+    const resultEl = document.getElementById('result');
+
+    function logResult(data, title = 'Результат:') {
+        resultEl.innerHTML = `<strong>${title}</strong>\n\n` + JSON.stringify(data, null, 2);
+        console.log(title, data);
+    }
+
+    async function testGet() {
+        try {
+            const response = await fetch('/tasks/test/');
+            const data = await response.json();
+            logResult(data, '✅ GET запрос успешен:');
+        } catch (error) {
+            logResult({ error: error.message }, '❌ Ошибка GET:');
+        }
+    }
+
+    async function testPostForm() {
+        try {
+            const formData = new FormData();
+            formData.append('status', 'in_progress');
+            formData.append('test_field', 'test_value');
+
+            const response = await fetch('/tasks/test/post/', {
+                method: 'POST',
+                body: formData
+            });
+
+            const data = await response.json();
+            logResult(data, '✅ POST FormData успешен:');
+        } catch (error) {
+            logResult({ error: error.message }, '❌ Ошибка POST FormData:');
+        }
+    }
+
+    async function testPostJSON() {
+        try {
+            const response = await fetch('/tasks/test/post/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    status: 'in_progress',
+                    test: 'json_value'
+                })
+            });
+
+            const data = await response.json();
+            logResult(data, '✅ POST JSON успешен:');
+        } catch (error) {
+            logResult({ error: error.message }, '❌ Ошибка POST JSON:');
+        }
+    }
+
+    async function testTaskDetail() {
+        const taskId = document.getElementById('taskId').value;
+        try {
+            const response = await fetch(`/tasks/task/${taskId}/detail/`);
+            const data = await response.json();
+            logResult(data, `✅ Детали задачи #${taskId}:`);
+        } catch (error) {
+            logResult({ error: error.message }, '❌ Ошибка получения деталей:');
+        }
+    }
+
+    async function testUpdateStatus() {
+        const taskId = document.getElementById('updateTaskId').value;
+        const newStatus = document.getElementById('newStatus').value;
+
+        try {
+            // ИМЕННО ТАК Kanban отправляет запрос!
+            const formData = new FormData();
+            formData.append('status', newStatus);
+
+            console.log('Отправляем запрос:', {
+                url: `/tasks/task/${taskId}/update_status/`,
+                method: 'POST',
+                body: formData
+            });
+
+            const response = await fetch(`/tasks/task/${taskId}/update_status/`, {
+                method: 'POST',
+                body: formData
+            });
+
+            // Сначала читаем как текст
+            const responseText = await response.text();
+            console.log('Ответ (текст):', responseText);
+
+            // Пытаемся разобрать JSON
+            let data;
+            try {
+                data = JSON.parse(responseText);
+            } catch (e) {
+                logResult({
+                    error: 'Неверный JSON в ответе',
+                    responseText: responseText,
+                    status: response.status
+                }, `❌ Ошибка JSON (статус ${response.status}):`);
+                return;
+            }
+
+            if (response.ok) {
+                logResult(data, `✅ Статус задачи #${taskId} обновлен на "${newStatus}":`);
+            } else {
+                logResult(data, `❌ Ошибка сервера (статус ${response.status}):`);
+            }
+        } catch (error) {
+            logResult({
+                error: error.message,
+                taskId: taskId,
+                newStatus: newStatus
+            }, '❌ Сетевая ошибка:');
+        }
+    }
+
+    async function simulateKanbanDrag() {
+        // ТОЧНАЯ имитация запроса из Kanban
+        const taskId = 4; // ID задачи из вашего Kanban
+        const newStatus = 'in_progress'; // Новый статус
+
+        try {
+            const formData = new FormData();
+            formData.append('status', newStatus);
+
+            console.log('🚀 Имитация Kanban drag-and-drop:');
+            console.log('URL:', `/tasks/task/${taskId}/update_status/`);
+            console.log('Method: POST');
+            console.log('Data:', { status: newStatus });
+
+            const response = await fetch(`/tasks/task/${taskId}/update_status/`, {
+                method: 'POST',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                },
+                body: formData
+            });
+
+            const responseText = await response.text();
+            console.log('📨 Ответ от сервера:', responseText);
+
+            let data;
+            try {
+                data = JSON.parse(responseText);
+            } catch (e) {
+                resultEl.innerHTML = `
+                    <strong>❌ Сервер вернул не JSON!</strong>
+                    <div style="color: red; margin-top: 10px;">
+                        <strong>Статус:</strong> ${response.status}<br>
+                        <strong>Ответ:</strong><br>
+                        <pre>${responseText.substring(0, 500)}${responseText.length > 500 ? '...' : ''}</pre>
+                    </div>
+                `;
+                return;
+            }
+
+            if (response.ok && data.success) {
+                logResult(data, `✅ Kanban запрос успешен! Задача #${taskId} -> "${newStatus}":`);
+            } else {
+                logResult(data, `❌ Kanban запрос не удался (статус ${response.status}):`);
+            }
+        } catch (error) {
+            logResult({
+                error: error.message,
+                details: 'Проверьте консоль браузера и терминал Django'
+            }, '❌ Ошибка при имитации Kanban:');
+        }
+    }
+
+    // Загружаем список задач при загрузке страницы
+    async function loadTasks() {
+        try {
+            const response = await fetch('/tasks/test/');
+            const data = await response.json();
+            console.log('Страница загружена, тестовый эндпоинт работает:', data);
+        } catch (error) {
+            console.error('Ошибка при загрузке:', error);
+        }
+    }
+
+    // Запускаем при загрузке страницы
+    window.addEventListener('DOMContentLoaded', loadTasks);
+</script>
+</body>
+</html>

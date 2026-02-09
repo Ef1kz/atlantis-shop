@@ -1,22 +1,37 @@
+# accounts/admin.py
 from django.contrib import admin
-from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
-from django.contrib.auth.models import User
-from .models import UserProfile
+from django.contrib.auth.admin import UserAdmin
+from django.utils.translation import gettext_lazy as _
+from .models import CustomUser
 
-# Инлайн для профиля в админке пользователя
-class UserProfileInline(admin.StackedInline):
-    model = UserProfile
-    can_delete = False
-    verbose_name_plural = 'Профиль пользователя'
+class CustomUserAdmin(UserAdmin):
+    # Поля для отображения в списке
+    list_display = ('username', 'email', 'first_name', 'last_name', 'phone', 'is_staff')
+    list_filter = ('is_staff', 'is_superuser', 'is_active', 'groups')
 
-# Расширяем стандартную админку User
-class UserAdmin(BaseUserAdmin):
-    inlines = (UserProfileInline,)
+    # Поля для формы редактирования
+    fieldsets = (
+        (None, {'fields': ('username', 'password')}),
+        (_('Personal info'), {'fields': ('first_name', 'last_name', 'email', 'phone', 'address')}),
+        (_('Permissions'), {
+            'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions'),
+        }),
+        (_('Important dates'), {'fields': ('last_login', 'date_joined')}),
+    )
 
-# Отменяем регистрацию стандартного User
-admin.site.unregister(User)
-# Регистрируем User с расширенной админкой
-admin.site.register(User, UserAdmin)
+    # Поля для формы добавления пользователя
+    add_fieldsets = (
+        (None, {
+            'classes': ('wide',),
+            'fields': ('username', 'email', 'phone', 'password1', 'password2'),
+        }),
+    )
 
-# Опционально: регистрируем отдельно, если хочешь видеть профили отдельно
-# admin.site.register(UserProfile)
+    # Поиск
+    search_fields = ('username', 'first_name', 'last_name', 'email', 'phone')
+
+    # Порядок сортировки
+    ordering = ('username',)
+
+# Регистрируем модель с кастомным админом
+admin.site.register(CustomUser, CustomUserAdmin)

@@ -4,6 +4,8 @@ from .models import Review
 
 @admin.register(Review)
 class ReviewAdmin(admin.ModelAdmin):
-    list_display = ['user', 'product', 'rating', 'created_at']
-    list_filter = ['rating', 'created_at']
-    search_fields = ['user__username', 'product__name']
+    list_display = ['product', 'user', 'rating', 'created_at', 'is_approved']
+    list_filter = ['rating', 'is_approved', 'created_at']
+    search_fields = ['product__name', 'user__username', 'comment']
+    list_editable = ['is_approved']
+    readonly_fields = ['created_at', 'updated_at']

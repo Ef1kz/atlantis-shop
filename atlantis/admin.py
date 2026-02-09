@@ -1,36 +1,46 @@
 # atlantis/admin.py
-from django.contrib import admin
 from django.contrib.admin import AdminSite
 from django.utils.translation import gettext_lazy as _
-from django.utils import timezone
-from django.apps import apps
+from django.contrib.auth.models import Group, User
+from django.contrib.auth.admin import GroupAdmin, UserAdmin
+from accounts.models import CustomUser
 
 class AtlantisAdminSite(AdminSite):
-    site_header = "ATLANTIS Администрирование"
-    site_title = "ATLANTIS Admin"
-    index_title = "Корпоративная панель"
+    site_header = _('ATLANTIS Администрирование')
+    site_title = _('ATLANTIS Admin')
+    index_title = _('Панель управления')
 
-    def index(self, request, extra_context=None):
-        from tasks.models import Task
-        from orders.models import Order
+    def get_app_list(self, request):
+        app_list = super().get_app_list(request)
 
-        stats = {
-            'new_tasks': Task.objects.filter(status='new').count(),
-            'in_progress': Task.objects.filter(status='in_progress').count(),
-            'completed': Task.objects.filter(status='completed').count(),
-            'today_orders': Order.objects.filter(created_at__date=timezone.now().date()).count(),
-        }
+        # Добавляем ссылку на Kanban доску в меню Tasks
+        for app in app_list:
+            if app['app_label'] == 'tasks':
+                app['models'].append({
+                    'name': 'Доска задач',
+                    'object_name': 'kanban',
+                    'admin_url': '/admin/tasks/task/?view=kanban',
+                    'view_only': True,
+                })
 
-        extra_context = extra_context or {}
-        extra_context.update(stats)
+        return app_list
 
-        return super().index(request, extra_context=extra_context)
+# Создаем экземпляр кастомной админки
+admin_site = AtlantisAdminSite(name='atlantis_admin')
 
-admin_site = AtlantisAdminSite(name='admin')
+# Регистрируем стандартные модели
+admin_site.register(Group, GroupAdmin)
+admin_site.register(User, UserAdmin)
 
-# Автоматическая регистрация всех моделей
-for model in apps.get_models():
-    try:
-        admin_site.register(model)
-    except admin.sites.AlreadyRegistered:
-        pass
+# Регистрируем CustomUser
+from accounts.admin import CustomUserAdmin
+admin_site.register(CustomUser, CustomUserAdmin)
+
+# Регистрируем задачи из нашего кастомного TaskAdmin
+try:
+    from tasks.models import Task
+    from tasks.admin import TaskAdmin  # Импортируем наш кастомный TaskAdmin
+    admin_site.register(Task, TaskAdmin)
+    print("✅ Task model registered in custom admin")
+except ImportError as e:
+    print(f"⚠️ Tasks app not found: {e}")

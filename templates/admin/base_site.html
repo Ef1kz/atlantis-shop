@@ -1,0 +1,447 @@
+<!-- templates/admin/base_site.html -->
+{% extends "admin/base.html" %}
+{% load static i18n %}
+
+{% block title %}{{ title }} | ATLANTIS Администрирование{% endblock %}
+
+{% block extrastyle %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'admin/css/kanban.css' %}">
+<style>
+    /* ==================== ЦВЕТОВАЯ СХЕМА ATLANTIS ==================== */
+    :root {
+        --atlantis-gold: #FCC6A9;
+        --atlantis-dark: #121212;
+        --atlantis-darker: #0a0a0a;
+        --atlantis-lighter: #1e1e1e;
+        --atlantis-border: #2d2d2d;
+        --text-light: #e0e0e0;
+        --text-muted: #888;
+    }
+
+    /* ==================== ГЛОБАЛЬНЫЙ ФОН ==================== */
+    body {
+        background: var(--atlantis-darker) !important;
+        color: var(--text-light) !important;
+        font-family: 'Roboto', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    /* ==================== ШАПКА (HEADER) ==================== */
+    #header {
+        background: var(--atlantis-dark) !important;
+        border-bottom: 1px solid var(--atlantis-border);
+        padding: 12px 20px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        min-height: 60px;
+    }
+
+    /* Логотип и название */
+    #branding h1,
+    #branding h1 a {
+        color: var(--atlantis-gold) !important;
+        font-size: 1.5em;
+        font-weight: 700;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin: 0;
+        letter-spacing: 1px;
+    }
+
+    #branding h1 a:hover {
+        opacity: 0.9;
+    }
+
+    #branding img {
+        height: 40px;
+        width: auto;
+    }
+
+    /* User tools в шапке */
+    #user-tools {
+        color: var(--text-light);
+        font-size: 0.95em;
+        text-align: right;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    #user-tools strong {
+        color: var(--atlantis-gold);
+        font-weight: 600;
+    }
+
+    #user-tools a {
+        color: var(--atlantis-gold) !important;
+        text-decoration: none;
+        font-weight: 500;
+        transition: opacity 0.2s;
+    }
+
+    #user-tools a:hover {
+        opacity: 0.8;
+        text-decoration: underline;
+    }
+
+    /* ==================== ЛЕВАЯ НАВИГАЦИЯ (SIDEBAR) ==================== */
+    /* Убираем стандартную светлую навигацию Django */
+    #content-main {
+        background: transparent !important;
+    }
+
+    .module {
+        background: var(--atlantis-lighter) !important;
+        border: 1px solid var(--atlantis-border) !important;
+        border-radius: 8px;
+        margin-bottom: 20px;
+    }
+
+    .module h2,
+    .module caption {
+        background: var(--atlantis-dark) !important;
+        color: var(--atlantis-gold) !important;
+        font-weight: 600;
+        padding: 12px 16px;
+        border-bottom: 1px solid var(--atlantis-border);
+    }
+
+    .module table {
+        background: transparent !important;
+    }
+
+    .module th,
+    .module td {
+        background: var(--atlantis-lighter) !important;
+        color: var(--text-light) !important;
+        border-bottom: 1px solid var(--atlantis-border) !important;
+        padding: 12px 16px;
+    }
+
+    .module th a,
+    .module td a {
+        color: var(--atlantis-gold) !important;
+        text-decoration: none;
+        transition: opacity 0.2s;
+    }
+
+    .module th a:hover,
+    .module td a:hover {
+        opacity: 0.8;
+        text-decoration: underline;
+    }
+
+    /* Ссылки "Добавить" и "Изменить" */
+    .addlink,
+    .changelink,
+    .viewlink {
+        color: var(--atlantis-gold) !important;
+        font-weight: 500;
+    }
+
+    .addlink::before {
+        content: "+ ";
+    }
+
+    /* ==================== КНОПКИ ==================== */
+    .button,
+    input[type="submit"],
+    input[type="button"],
+    .submit-row input,
+    button {
+        background: var(--atlantis-gold) !important;
+        color: #000 !important;
+        border: none !important;
+        font-weight: 600 !important;
+        padding: 10px 20px !important;
+        border-radius: 6px !important;
+        cursor: pointer;
+        transition: opacity 0.2s;
+        text-decoration: none !important;
+    }
+
+    .button:hover,
+    input[type="submit"]:hover,
+    input[type="button"]:hover {
+        opacity: 0.9 !important;
+    }
+
+    /* Кнопка "Добавить задачу" */
+    .btn-add-top {
+        background: var(--atlantis-gold) !important;
+        color: #000 !important;
+        padding: 10px 24px;
+        border-radius: 6px;
+        text-decoration: none;
+        font-weight: 600;
+        display: inline-block;
+        transition: opacity 0.2s;
+    }
+
+    .btn-add-top:hover {
+        opacity: 0.9;
+    }
+
+    /* ==================== ФОРМЫ И ПОЛЯ ВВОДА ==================== */
+    input[type="text"],
+    input[type="password"],
+    input[type="email"],
+    input[type="number"],
+    input[type="date"],
+    input[type="time"],
+    select,
+    textarea {
+        background: var(--atlantis-lighter) !important;
+        border: 1px solid var(--atlantis-border) !important;
+        color: var(--text-light) !important;
+        padding: 8px 12px;
+        border-radius: 4px;
+    }
+
+    input[type="text"]:focus,
+    input[type="password"]:focus,
+    select:focus,
+    textarea:focus {
+        border-color: var(--atlantis-gold) !important;
+        outline: none;
+    }
+
+    /* ==================== ТАБЛИЦЫ ==================== */
+    #result_list {
+        background: var(--atlantis-lighter) !important;
+        border: 1px solid var(--atlantis-border);
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    #result_list thead th {
+        background: var(--atlantis-dark) !important;
+        color: var(--atlantis-gold) !important;
+        font-weight: 600;
+        border-bottom: 2px solid var(--atlantis-border) !important;
+    }
+
+    #result_list tbody tr {
+        background: var(--atlantis-lighter) !important;
+        border-bottom: 1px solid var(--atlantis-border) !important;
+    }
+
+    #result_list tbody tr:hover {
+        background: var(--atlantis-dark) !important;
+    }
+
+    #result_list td,
+    #result_list th {
+        color: var(--text-light) !important;
+        padding: 12px 16px;
+    }
+
+    #result_list a {
+        color: var(--atlantis-gold) !important;
+        text-decoration: none;
+    }
+
+    #result_list a:hover {
+        text-decoration: underline;
+    }
+
+    /* ==================== BREADCRUMBS ==================== */
+    .breadcrumbs {
+        background: var(--atlantis-dark) !important;
+        color: var(--text-light) !important;
+        padding: 12px 20px;
+        border-bottom: 1px solid var(--atlantis-border);
+    }
+
+    .breadcrumbs a {
+        color: var(--atlantis-gold) !important;
+        text-decoration: none;
+    }
+
+    .breadcrumbs a:hover {
+        text-decoration: underline;
+    }
+
+    /* ==================== УВЕДОМЛЕНИЯ ==================== */
+    .notify {
+        position: fixed;
+        top: 80px;
+        right: 20px;
+        background: #28a745;
+        color: white;
+        padding: 14px 28px;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(40, 167, 69, 0.4);
+        opacity: 0;
+        transition: opacity 0.4s ease, transform 0.3s ease;
+        z-index: 9999;
+        font-weight: bold;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        transform: translateY(-20px);
+    }
+
+    .notify::before {
+        content: "✓";
+        font-size: 20px;
+    }
+
+    .notify.show {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    /* ==================== КОНТЕНТ ==================== */
+    #content {
+        background: var(--atlantis-darker) !important;
+        padding: 20px;
+    }
+
+    #content h1 {
+        color: var(--atlantis-gold);
+        font-weight: 700;
+        margin-bottom: 20px;
+    }
+
+    /* ==================== ПАГИНАЦИЯ ==================== */
+    .paginator {
+        color: var(--text-light) !important;
+    }
+
+    .paginator a {
+        color: var(--atlantis-gold) !important;
+        text-decoration: none;
+        padding: 5px 10px;
+        border: 1px solid var(--atlantis-border);
+        border-radius: 4px;
+        margin: 0 2px;
+    }
+
+    .paginator a:hover {
+        background: var(--atlantis-lighter);
+    }
+
+    /* ==================== СООБЩЕНИЯ ==================== */
+    .messagelist {
+        margin: 0;
+        padding: 0;
+    }
+
+    .messagelist li {
+        background: var(--atlantis-lighter) !important;
+        border: 1px solid var(--atlantis-border);
+        color: var(--text-light) !important;
+        padding: 12px 16px;
+        border-radius: 6px;
+        margin-bottom: 10px;
+    }
+
+    .messagelist .success {
+        background: #1e4620 !important;
+        border-color: #28a745;
+        color: #90ee90 !important;
+    }
+
+    .messagelist .error {
+        background: #4a1616 !important;
+        border-color: #dc3545;
+        color: #ffb3b3 !important;
+    }
+
+    /* ==================== ПОИСК ==================== */
+    #searchbar {
+        background: var(--atlantis-lighter) !important;
+        border: 1px solid var(--atlantis-border) !important;
+        color: var(--text-light) !important;
+        padding: 8px 12px;
+        border-radius: 4px;
+    }
+
+    #searchbar:focus {
+        border-color: var(--atlantis-gold) !important;
+        outline: none;
+    }
+
+    /* ==================== ФИЛЬТРЫ ==================== */
+    #changelist-filter {
+        background: var(--atlantis-lighter) !important;
+        border: 1px solid var(--atlantis-border);
+        border-radius: 8px;
+        padding: 15px;
+    }
+
+    #changelist-filter h2 {
+        color: var(--atlantis-gold);
+        font-weight: 600;
+        border-bottom: 1px solid var(--atlantis-border);
+        padding-bottom: 10px;
+    }
+
+    #changelist-filter h3 {
+        color: var(--text-light);
+        font-size: 0.9em;
+        font-weight: 500;
+        margin-top: 15px;
+    }
+
+    #changelist-filter a {
+        color: var(--text-light) !important;
+        text-decoration: none;
+        display: block;
+        padding: 5px 0;
+    }
+
+    #changelist-filter a:hover {
+        color: var(--atlantis-gold) !important;
+    }
+
+    #changelist-filter li.selected a {
+        color: var(--atlantis-gold) !important;
+        font-weight: 600;
+    }
+
+    /* ==================== RESPONSIVE ==================== */
+    @media (max-width: 768px) {
+        #header {
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        #user-tools {
+            flex-direction: column;
+            text-align: center;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block branding %}
+<h1 id="site-name">
+    <a href="{% url 'admin:index' %}">
+        ATLANTIS Администрирование
+    </a>
+</h1>
+{% endblock %}
+
+{% block userlinks %}
+<a href="/">Открыть приложение</a> /
+{% if user.is_active and user.is_staff %}
+{% url 'django-admindocs-docroot' as docsroot %}
+{% if docsroot %}
+<a href="{{ docsroot }}">{% translate 'Documentation' %}</a> /
+{% endif %}
+{% endif %}
+{% if user.has_usable_password %}
+<a href="{% url 'admin:password_change' %}">{% translate 'Change password' %}</a> /
+{% endif %}
+<form id="logout-form" method="post" action="{% url 'admin:logout' %}">
+    {% csrf_token %}
+    <button type="submit" style="background: none; border: none; color: var(--atlantis-gold); cursor: pointer; font: inherit;">{% translate 'Log out' %}</button>
+</form>
+{% endblock %}
+
+{% block nav-global %}{% endblock %}
