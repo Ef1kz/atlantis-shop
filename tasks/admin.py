@@ -7,6 +7,7 @@ from django.utils.decorators import method_decorator
 from django.contrib.auth import get_user_model
 from .models import Task, TaskComment
 
+
 User = get_user_model()
 
 # ==================== ГЛОБАЛЬНАЯ КАСТОМИЗАЦИЯ ADMIN SITE ====================
@@ -206,3 +207,6 @@ class TaskCommentAdmin(admin.ModelAdmin):
     list_filter = ['created_at']
     search_fields = ['task__title', 'author__username', 'content']
     readonly_fields = ['created_at']
+
+    from django.contrib.auth.models import Group
+    from django.contrib.auth.admin import GroupAdmin

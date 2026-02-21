@@ -1,46 +1,48 @@
-# atlantis/admin.py
-from django.contrib.admin import AdminSite
-from django.utils.translation import gettext_lazy as _
-from django.contrib.auth.models import Group, User
-from django.contrib.auth.admin import GroupAdmin, UserAdmin
-from accounts.models import CustomUser
+def get_app_list(self, request):
+    app_list = super().get_app_list(request)
+    new_app_list = []
+    category_model = None
 
-class AtlantisAdminSite(AdminSite):
-    site_header = _('ATLANTIS Администрирование')
-    site_title = _('ATLANTIS Admin')
-    index_title = _('Панель управления')
+    # Сначала ищем категории в продуктах, чтобы сохранить ссылку
+    for app in app_list:
+        if app['app_label'] == 'products':
+            for model in app['models']:
+                if model['object_name'].lower() == 'category':
+                    category_model = model
 
-    def get_app_list(self, request):
-        app_list = super().get_app_list(request)
+    for app in app_list:
+        # Очищаем вложенные модели сразу, чтобы они не рисовались (те самые кнопки на англ)
+        app_label = app['app_label']
 
-        # Добавляем ссылку на Kanban доску в меню Tasks
-        for app in app_list:
-            if app['app_label'] == 'tasks':
-                app['models'].append({
-                    'name': 'Доска задач',
-                    'object_name': 'kanban',
-                    'admin_url': '/admin/tasks/task/?view=kanban',
-                    'view_only': True,
-                })
+        # Настраиваем ссылки для заголовков
+        if app_label == 'tasks':
+            app['app_url'] = '/admin/tasks/task/?view=kanban' # ЗАДАЧИ -> Канбан
+        elif app_label == 'products':
+            app['app_url'] = '/admin/products/product/'      # ТОВАРЫ -> Список товаров
+        elif app_label == 'orders':
+            app['app_url'] = '/admin/orders/order/'          # ЗАКАЗЫ -> Список заказов
+        elif app_label == 'accounts':
+            app['app_url'] = '/admin/accounts/customuser/'   # ПОЛЬЗОВАТЕЛИ -> Список юзеров
+        elif app_label == 'cart':
+            app['app_url'] = '/admin/cart/cart/'             # КОРЗИНЫ
+        elif app_label == 'reviews':
+            app['app_url'] = '/admin/reviews/review/'        # ОТЗЫВЫ
+        elif app['models']:
+            # Для всех остальных — ведем на первую модель в списке
+            app['app_url'] = app['models'][0]['admin_url']
 
-        return app_list
+        # ГЛАВНОЕ: Убиваем вложенные пункты, чтобы не было "смешного" раскрытия
+        app['models'] = []
+        new_app_list.append(app)
 
-# Создаем экземпляр кастомной админки
-admin_site = AtlantisAdminSite(name='atlantis_admin')
+    # Добавляем КАТЕГОРИИ отдельной большой кнопкой
+    if category_model:
+        new_app_list.insert(2, {
+            'name': 'КАТЕГОРИИ',
+            'app_label': 'categories_custom',
+            'app_url': category_model['admin_url'],
+            'models': [],
+            'has_module_perms': True,
+        })
 
-# Регистрируем стандартные модели
-admin_site.register(Group, GroupAdmin)
-admin_site.register(User, UserAdmin)
-
-# Регистрируем CustomUser
-from accounts.admin import CustomUserAdmin
-admin_site.register(CustomUser, CustomUserAdmin)
-
-# Регистрируем задачи из нашего кастомного TaskAdmin
-try:
-    from tasks.models import Task
-    from tasks.admin import TaskAdmin  # Импортируем наш кастомный TaskAdmin
-    admin_site.register(Task, TaskAdmin)
-    print("✅ Task model registered in custom admin")
-except ImportError as e:
-    print(f"⚠️ Tasks app not found: {e}")
+    return new_app_list

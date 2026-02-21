@@ -4,11 +4,30 @@
 {% block title %}Заказ оформлен — ATLANTIS{% endblock %}
 
 {% block content %}
-<div class="text-center mt-5">
-    <h1 class="gold">СПАСИБО ЗА ЗАКАЗ!</h1>
-    <p class="lead">Ваш заказ ожидает подтверждения менеджером.</p>
-    <p>Вы получите уведомление по email или SMS.</p>
-    <a href="/" class="btn btn-gold mt-3">На главную</a>
-    <a href="{% url 'cart:detail' %}" class="btn btn-action mt-3">← Назад в корзину</a>
+<div class="container py-5 text-center">
+    <!-- Иконка успеха (зелёный круг с галочкой) -->
+    <div class="mb-5">
+        <svg width="100" height="100" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="50" cy="50" r="45" stroke="#28a745" stroke-width="10" fill="none"/>
+            <path d="M30 50 L45 65 L70 35" stroke="#28a745" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+    </div>
+
+    <h1 class="gold mb-4 display-4 fw-bold">ЗАКАЗ УСПЕШНО ОФОРМЛЕН!</h1>
+
+    <p class="lead mb-5" style="font-size: 1.3rem; max-width: 800px; margin: 0 auto; line-height: 1.6;">
+        Спасибо за ваш заказ! Мы получили вашу заявку и в ближайшее время наш менеджер свяжется с вами для подтверждения деталей, уточнения оплаты и организации доставки.
+    </p>
+
+    <p class="text-muted mb-5" style="font-size: 1.1rem;">
+        Вы всегда можете просмотреть статус заказа в разделе «Мои заказы».
+    </p>
+
+    <div class="d-flex justify-content-center gap-4 flex-wrap">
+        <a href="{% url 'products:product_list' %}" class="btn btn-gold btn-lg px-5">Вернуться в каталог</a>
+        {% if user.is_authenticated %}
+        <a href="{% url 'orders:user_orders' %}" class="btn btn-outline-gold btn-lg px-5">Мои заказы</a>
+        {% endif %}
+    </div>
 </div>
 {% endblock %}

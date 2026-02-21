@@ -1,17 +1,33 @@
 # products/views.py
 from django.shortcuts import render
 from .models import Product
+from django.shortcuts import render, get_object_or_404
+from django.contrib.auth.decorators import login_required
+from reviews.forms import ReviewForm
+from reviews.models import Review
 
 def product_list(request):
     products = Product.objects.all().order_by('-created_at')
     return render(request, 'products/list.html', {'products': products})
 
 def product_detail(request, pk):
-    product = Product.objects.get(pk=pk)
-    reviews = product.reviews.all()
+    product = get_object_or_404(Product, pk=pk)
+    reviews = product.reviews.filter(is_approved=True)  # Только одобренные
+
+    review_form = None
+    has_reviewed = False
+
+    if request.user.is_authenticated:
+        if Review.objects.filter(product=product, user=request.user).exists():
+            has_reviewed = True
+        else:
+            review_form = ReviewForm()
+
     return render(request, 'products/detail.html', {
         'product': product,
-        'reviews': reviews
+        'reviews': reviews,
+        'review_form': review_form,
+        'has_reviewed': has_reviewed,
     })
 
 def product_list_by_collection(request, collection_slug):

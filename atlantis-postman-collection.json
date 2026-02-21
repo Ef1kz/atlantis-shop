@@ -1,0 +1,140 @@
+{
+  "info": {
+    "name": "ATLANTIS - Полная коллекция (v5 - с исправлениями и скриптом)",
+    "description": "Обновлённая коллекция с Pre-request Script для CSRF",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://127.0.0.1:8000",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "01. Авторизация",
+      "item": [
+        {
+          "name": "Регистрация пользователя",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "json",
+              "json": {
+                "username": "testuser99",
+                "email": "test99@example.com",
+                "phone": "+79161234567",
+                "password1": "StrongPass123",
+                "password2": "StrongPass123"
+              }
+            },
+            "url": "{{base_url}}/accounts/register/"
+          }
+        },
+        {
+          "name": "Вход в систему",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "json",
+              "json": {
+                "username": "testuser99",
+                "password": "StrongPass123"
+              }
+            },
+            "url": "{{base_url}}/accounts/login/"
+          }
+        }
+      ]
+    },
+    {
+      "name": "02. Корзина",
+      "item": [
+        {
+          "name": "Добавить товар в корзину",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": "{{base_url}}/cart/add/5/"
+          }
+        },
+        {
+          "name": "Получить количество в корзине",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/cart/count/"
+          }
+        }
+      ]
+    },
+    {
+      "name": "03. Kanban-доска",
+      "item": [
+        {
+          "name": "Обновить статус задачи (Drag & Drop)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"in_progress\"\n}"
+            },
+            "url": "{{base_url}}/admin/tasks/task/12/update_status/"
+          }
+        },
+        {
+          "name": "Получить детали задачи",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/admin/tasks/task/12/detail/"
+          }
+        },
+        {
+          "name": "Создать новую задачу",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Проверить заказ №145\",\n  \"status\": \"todo\",\n  \"priority\": \"high\"\n}"
+            },
+            "url": "{{base_url}}/admin/tasks/task/create_modal/"
+          }
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "const csrfCookie = pm.cookies.get('csrftoken');",
+          "if (csrfCookie && csrfCookie.value) {",
+          "    pm.request.headers.add({",
+          "        key: 'X-CSRFToken',",
+          "        value: csrfCookie.value",
+          "    });",
+          "    console.log('CSRF Token добавлен автоматически');",
+          "} else {",
+          "    console.warn('CSRF Token не найден! Залогинься в браузере.');",
+          "}"
+        ]
+      }
+    }
+  ]
+}

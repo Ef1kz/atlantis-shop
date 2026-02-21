@@ -6,4 +6,5 @@ app_name = 'orders'
 
 urlpatterns = [
     path('', views.user_orders, name='user_orders'),
+
 ]

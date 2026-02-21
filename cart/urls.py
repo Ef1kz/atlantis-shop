@@ -1,13 +1,13 @@
-# cart/urls.py
 from django.urls import path
-from . import views
+from . import views  # ← Это импортирует views из cart/views.py
 
 app_name = 'cart'
 
 urlpatterns = [
-    path('', views.cart_detail, name='detail'),
-    path('add/<int:product_id>/', views.cart_add, name='cart_add'),
-    path('count/', views.cart_count, name='cart_count'),
-    path('checkout/', views.cart_checkout, name='checkout'),
+    path('add/<int:product_id>/', views.add, name='add'),
+    path('count/', views.count, name='count'),
+    path('checkout/', views.checkout, name='checkout'),
     path('checkout/success/', views.checkout_success, name='checkout_success'),
+    path('', views.detail, name='detail'),
+    path('remove/<int:item_id>/', views.remove, name='remove'),  # ← Здесь views определено
 ]

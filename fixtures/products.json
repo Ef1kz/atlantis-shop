@@ -1,0 +1,676 @@
+[
+  {
+    "model": "products.product",
+    "fields": {
+      "name": "Grohe Essence Смеситель для раковины",
+      "slug": "grohe-essence-smesitel-dlya-rakoviny",
+      "price": 28500,
+      "stock": 15,
+      "available": true,
+      "category": 1,
+      "description": "Однорычажный смеситель с технологией EcoJoy и керамическим картриджем.",
+      "created_at": "2026-02-11T12:00:00Z",
+      "updated_at": "2026-02-11T12:00:00Z"
+    }
+  },
+  {
+    "model": "products.product",
+    "fields": {
+      "name": "Hansgrohe Talis E Смеситель для ванны",
+      "slug": "hansgrohe-talis-e-smesitel-dlya-vanny",
+      "price": 37800,
+      "stock": 10,
+      "available": true,
+      "category": 1,
+      "description": "Настенный смеситель с поворотным изливом.",
+      "created_at": "2026-02-11T12:00:00Z",
+      "updated_at": "2026-02-11T12:00:00Z"
+    }
+  },
+  {
+    "model": "products.product",
+    "fields": {
+      "name": "Axor Starck Смеситель для душа",
+      "slug": "axor-starck-smesitel-dlya-dusha",
+      "price": 65200,
+      "stock": 6,
+      "available": true,
+      "category": 1,
+      "description": "Минималистичный дизайн Philippe Starck.",
+      "created_at": "2026-02-11T12:00:00Z",
+      "updated_at": "2026-02-11T12:00:00Z"
+    }
+  },
+  {
+    "model": "products.product",
+    "fields": {
+      "name": "Kludi Bozz Смеситель для биде",
+      "slug": "kludi-bozz-smesitel-dlya-bide",
+      "price": 31200,
+      "stock": 12,
+      "available": true,
+      "category": 1,
+      "description": "Компактный смеситель с донным клапаном.",
+      "created_at": "2026-02-11T12:00:00Z",
+      "updated_at": "2026-02-11T12:00:00Z"
+    }
+  },
+  {
+    "model": "products.product",
+    "fields": {
+      "name": "Grohe Eurosmart Смеситель для кухни",
+      "slug": "grohe-eurosmart-smesitel-dlya-kuhni",
+      "price": 24800,
+      "stock": 18,
+      "available": true,
+      "category": 1,
+      "description": "Высокий излив, поворотный.",
+      "created_at": "2026-02-11T12:00:00Z",
+      "updated_at": "2026-02-11T12:00:00Z"
+    }
+  },
+  {
+    "model": "products.product",
+    "fields": {
+      "name": "Hansgrohe Focus Смеситель термостатический",
+      "slug": "hansgrohe-focus-termostaticheskiy",
+      "price": 45600,
+      "stock": 8,
+      "available": true,
+      "category": 1,
+      "description": "Термостат для душа с безопасной температурой.",
+      "created_at": "2026-02-11T12:00:00Z",
+      "updated_at": "2026-02-11T12:00:00Z"
+    }
+  },
+  {
+    "model": "products.product",
+    "fields": {
+      "name": "Axor Citterio Смеситель для раковины высокий",
+      "slug": "axor-citterio-vysokiy",
+      "price": 89200,
+      "stock": 4,
+      "available": true,
+      "category": 1,
+      "description": "Высокий смеситель для накладных раковин.",
+      "created_at": "2026-02-11T12:00:00Z",
+      "updated_at": "2026-02-11T12:00:00Z"
+    }
+  },
+  {
+    "model": "products.product",
+    "fields": {
+      "name": "Kludi Zenta Смеситель электронный",
+      "slug": "kludi-zenta-elektronnyy",
+      "price": 67800,
+      "stock": 5,
+      "available": true,
+      "category": 1,
+      "description": "Сенсорный смеситель с экономией воды.",
+      "created_at": "2026-02-11T12:00:00Z",
+      "updated_at": "2026-02-11T12:00:00Z"
+    }
+  },
+  {
+    "model": "products.product",
+    "fields": {
+      "name": "Villeroy & Boch Architectura Раковина накладная 60 см",
+      "slug": "villeroy-boch-architectura-60",
+      "price": 45600,
+      "stock": 10,
+      "available": true,
+      "category": 2,
+      "description": "Керамическая накладная раковина с переливом.",
+      "created_at": "2026-02-11T12:00:00Z",
+      "updated_at": "2026-02-11T12:00:00Z"
+    }
+  },
+  {
+    "model": "products.product",
+    "fields": {
+      "name": "Duravit ME by Starck Раковина подвесная",
+      "slug": "duravit-me-by-starck",
+      "price": 39800,
+      "stock": 14,
+      "available": true,
+      "category": 2,
+      "description": "Компактная с тонким бортом.",
+      "created_at": "2026-02-11T12:00:00Z",
+      "updated_at": "2026-02-11T12:00:00Z"
+    }
+  },
+  {
+    "model": "products.product",
+    "fields": {
+      "name": "Laufen Pro S Раковина встраиваемая",
+      "slug": "laufen-pro-s",
+      "price": 34200,
+      "stock": 12,
+      "available": true,
+      "category": 2,
+      "description": "Встраиваемая с покрытием LCC.",
+      "created_at": "2026-02-11T12:00:00Z",
+      "updated_at": "2026-02-11T12:00:00Z"
+    }
+  },
+  {
+    "model": "products.product",
+    "fields": {
+      "name": "Villeroy & Boch Subway Раковина двойная",
+      "slug": "villeroy-boch-subway-dvoynaya",
+      "price": 78900,
+      "stock": 6,
+      "available": true,
+      "category": 2,
+      "description": "Двойная раковина для большой ванной.",
+      "created_at": "2026-02-11T12:00:00Z",
+      "updated_at": "2026-02-11T12:00:00Z"
+    }
+  },
+  {
+    "model": "products.product",
+    "fields": {
+      "name": "Duravit Vero Раковина угловая",
+      "slug": "duravit-vero-uglovaya",
+      "price": 51200,
+      "stock": 8,
+      "available": true,
+      "category": 2,
+      "description": "Угловая раковина для маленьких помещений.",
+      "created_at": "2026-02-11T12:00:00Z",
+      "updated_at": "2026-02-11T12:00:00Z"
+    }
+  },
+  {
+    "model": "products.product",
+    "fields": {
+      "name": "Hansgrohe PuraVida Раковина с пьедесталом",
+      "slug": "hansgrohe-puravida",
+      "price": 67800,
+      "stock": 5,
+      "available": true,
+      "category": 2,
+      "description": "Классическая раковина на пьедестале.",
+      "created_at": "2026-02-11T12:00:00Z",
+      "updated_at": "2026-02-11T12:00:00Z"
+    }
+  },
+  {
+    "model": "products.product",
+    "fields": {
+      "name": "Geberit iCon Раковина мини",
+      "slug": "geberit-icon-mini",
+      "price": 28900,
+      "stock": 20,
+      "available": true,
+      "category": 2,
+      "description": "Мини-раковина для гостевого санузла.",
+      "created_at": "2026-02-11T12:00:00Z",
+      "updated_at": "2026-02-11T12:00:00Z"
+    }
+  },
+  {
+    "model": "products.product",
+    "fields": {
+      "name": "Duravit DuraStyle Унитаз подвесной Rimless",
+      "slug": "duravit-durastyle-rimless",
+      "price": 48900,
+      "stock": 9,
+      "available": true,
+      "category": 3,
+      "description": "Безободковый унитаз с HygieneGlaze.",
+      "created_at": "2026-02-11T12:00:00Z",
+      "updated_at": "2026-02-11T12:00:00Z"
+    }
+  },
+  {
+    "model": "products.product",
+    "fields": {
+      "name": "Villeroy & Boch Subway 3.0 Биде подвесное",
+      "slug": "villeroy-boch-subway-bide",
+      "price": 51200,
+      "stock": 7,
+      "available": true,
+      "category": 3,
+      "description": "Подвесное биде с CeramicPlus.",
+      "created_at": "2026-02-11T12:00:00Z",
+      "updated_at": "2026-02-11T12:00:00Z"
+    }
+  },
+  {
+    "model": "products.product",
+    "fields": {
+      "name": "Geberit AquaClean Mera Унитаз-биде",
+      "slug": "geberit-aquaclean-mera",
+      "price": 285000,
+      "stock": 2,
+      "available": true,
+      "category": 3,
+      "description": "Умный унитаз-биде с обмывом и сушкой.",
+      "created_at": "2026-02-11T12:00:00Z",
+      "updated_at": "2026-02-11T12:00:00Z"
+    }
+  },
+  {
+    "model": "products.product",
+    "fields": {
+      "name": "Toto Neorest Унитаз-биде премиум",
+      "slug": "toto-neorest",
+      "price": 398000,
+      "stock": 1,
+      "available": true,
+      "category": 3,
+      "description": "Японский унитаз-биде с автоподъемом крышки.",
+      "created_at": "2026-02-11T12:00:00Z",
+      "updated_at": "2026-02-11T12:00:00Z"
+    }
+  },
+  {
+    "model": "products.product",
+    "fields": {
+      "name": "Villeroy & Boch Venticello Унитаз напольный",
+      "slug": "villeroy-boch-venticello",
+      "price": 67800,
+      "stock": 6,
+      "available": true,
+      "category": 3,
+      "description": "Напольный унитаз с мягким закрытием.",
+      "created_at": "2026-02-11T12:00:00Z",
+      "updated_at": "2026-02-11T12:00:00Z"
+    }
+  },
+  {
+    "model": "products.product",
+    "fields": {
+      "name": "Duravit Starck 3 Биде напольное",
+      "slug": "duravit-starck-3-bide",
+      "price": 45600,
+      "stock": 8,
+      "available": true,
+      "category": 3,
+      "description": "Классическое напольное биде.",
+      "created_at": "2026-02-11T12:00:00Z",
+      "updated_at": "2026-02-11T12:00:00Z"
+    }
+  },
+  {
+    "model": "products.product",
+    "fields": {
+      "name": "Laufen Kartell Унитаз подвесной",
+      "slug": "laufen-kartell",
+      "price": 78900,
+      "stock": 5,
+      "available": true,
+      "category": 3,
+      "description": "Дизайнерский унитаз от Kartell.",
+      "created_at": "2026-02-11T12:00:00Z",
+      "updated_at": "2026-02-11T12:00:00Z"
+    }
+  },
+  {
+    "model": "products.product",
+    "fields": {
+      "name": "Villeroy & Boch Loop & Friends Ванна 180x80",
+      "slug": "villeroy-boch-loop-friends-180",
+      "price": 178000,
+      "stock": 4,
+      "available": true,
+      "category": 4,
+      "description": "Акриловая ванна с тонкими бортами.",
+      "created_at": "2026-02-11T12:00:00Z",
+      "updated_at": "2026-02-11T12:00:00Z"
+    }
+  },
+  {
+    "model": "products.product",
+    "fields": {
+      "name": "Kaldenwhite Lux Отдельностоящая ванна",
+      "slug": "kaldenwhite-lux",
+      "price": 325000,
+      "stock": 2,
+      "available": true,
+      "category": 4,
+      "description": "Ванна из искусственного камня.",
+      "created_at": "2026-02-11T12:00:00Z",
+      "updated_at": "2026-02-11T12:00:00Z"
+    }
+  },
+  {
+    "model": "products.product",
+    "fields": {
+      "name": "Duravit Luv Ванна угловая",
+      "slug": "duravit-luv",
+      "price": 248000,
+      "stock": 3,
+      "available": true,
+      "category": 4,
+      "description": "Угловая ванна с гидромассажем.",
+      "created_at": "2026-02-11T12:00:00Z",
+      "updated_at": "2026-02-11T12:00:00Z"
+    }
+  },
+  {
+    "model": "products.product",
+    "fields": {
+      "name": "Hansgrohe PuraVida Ванна с подсветкой",
+      "slug": "hansgrohe-puravida-vanna",
+      "price": 298000,
+      "stock": 2,
+      "available": true,
+      "category": 4,
+      "description": "Ванна с хромотерапией.",
+      "created_at": "2026-02-11T12:00:00Z",
+      "updated_at": "2026-02-11T12:00:00Z"
+    }
+  },
+  {
+    "model": "products.product",
+    "fields": {
+      "name": "Villeroy & Boch Squaro Edge Ванна встроенная",
+      "slug": "villeroy-boch-squaro",
+      "price": 189000,
+      "stock": 5,
+      "available": true,
+      "category": 4,
+      "description": "Встроенная ванна из кварила.",
+      "created_at": "2026-02-11T12:00:00Z",
+      "updated_at": "2026-02-11T12:00:00Z"
+    }
+  },
+  {
+    "model": "products.product",
+    "fields": {
+      "name": "Riho Future Овальная ванна",
+      "slug": "riho-future",
+      "price": 156000,
+      "stock": 7,
+      "available": true,
+      "category": 4,
+      "description": "Овальная акриловая ванна.",
+      "created_at": "2026-02-11T12:00:00Z",
+      "updated_at": "2026-02-11T12:00:00Z"
+    }
+  },
+  {
+    "model": "products.product",
+    "fields": {
+      "name": "Grohe Atrio Смеситель для раковины",
+      "slug": "grohe-atrio-smesitel-dlya-rakoviny",
+      "price": 75600,
+      "stock": 7,
+      "available": true,
+      "category": 1,
+      "description": "Классический дизайн с двумя вентилями.",
+      "created_at": "2026-02-11T12:00:00Z",
+      "updated_at": "2026-02-11T12:00:00Z"
+    }
+  },
+  {
+    "model": "products.product",
+    "fields": {
+      "name": "Hansgrohe Metris Смеситель для ванны",
+      "slug": "hansgrohe-metris-smesitel-dlya-vanny",
+      "price": 49800,
+      "stock": 9,
+      "available": true,
+      "category": 1,
+      "description": "Эргономичный смеситель с донным клапаном.",
+      "created_at": "2026-02-11T12:00:00Z",
+      "updated_at": "2026-02-11T12:00:00Z"
+    }
+  },
+  {
+    "model": "products.product",
+    "fields": {
+      "name": "Axor Uno Смеситель для душа",
+      "slug": "axor-uno-smesitel-dlya-dusha",
+      "price": 81200,
+      "stock": 4,
+      "available": true,
+      "category": 1,
+      "description": "Минималистичный термостатический смеситель.",
+      "created_at": "2026-02-11T12:00:00Z",
+      "updated_at": "2026-02-11T12:00:00Z"
+    }
+  },
+  {
+    "model": "products.product",
+    "fields": {
+      "name": "Ideal Standard Cerafine Смеситель",
+      "slug": "ideal-standard-cerafine",
+      "price": 28900,
+      "stock": 20,
+      "available": true,
+      "category": 1,
+      "description": "Компактный смеситель с керамическим картриджем.",
+      "created_at": "2026-02-11T12:00:00Z",
+      "updated_at": "2026-02-11T12:00:00Z"
+    }
+  },
+  {
+    "model": "products.product",
+    "fields": {
+      "name": "Roca Loft Смеситель электронный",
+      "slug": "roca-loft-elektronnyy",
+      "price": 59800,
+      "stock": 6,
+      "available": true,
+      "category": 1,
+      "description": "Сенсорный смеситель с LED-подсветкой.",
+      "created_at": "2026-02-11T12:00:00Z",
+      "updated_at": "2026-02-11T12:00:00Z"
+    }
+  },
+  {
+    "model": "products.product",
+    "fields": {
+      "name": "Cersanit Como Раковина накладная",
+      "slug": "cersanit-como-nakladnaya",
+      "price": 24800,
+      "stock": 18,
+      "available": true,
+      "category": 2,
+      "description": "Керамическая раковина 50 см с переливом.",
+      "created_at": "2026-02-11T12:00:00Z",
+      "updated_at": "2026-02-11T12:00:00Z"
+    }
+  },
+  {
+    "model": "products.product",
+    "fields": {
+      "name": "Roca Gap Раковина подвесная",
+      "slug": "roca-gap-podvesnaya",
+      "price": 35600,
+      "stock": 12,
+      "available": true,
+      "category": 2,
+      "description": "Компактная подвесная раковина.",
+      "created_at": "2026-02-11T12:00:00Z",
+      "updated_at": "2026-02-11T12:00:00Z"
+    }
+  },
+  {
+    "model": "products.product",
+    "fields": {
+      "name": "Ideal Standard Connect Раковина",
+      "slug": "ideal-standard-connect",
+      "price": 31200,
+      "stock": 15,
+      "available": true,
+      "category": 2,
+      "description": "Встраиваемая раковина с тонким бортом.",
+      "created_at": "2026-02-11T12:00:00Z",
+      "updated_at": "2026-02-11T12:00:00Z"
+    }
+  },
+  {
+    "model": "products.product",
+    "fields": {
+      "name": "Jacob Delafon Odeon Раковина",
+      "slug": "jacob-delafon-odeon",
+      "price": 45600,
+      "stock": 8,
+      "available": true,
+      "category": 2,
+      "description": "Классическая раковина на пьедестале.",
+      "created_at": "2026-02-11T12:00:00Z",
+      "updated_at": "2026-02-11T12:00:00Z"
+    }
+  },
+  {
+    "model": "products.product",
+    "fields": {
+      "name": "Roca Diverta Раковина угловая",
+      "slug": "roca-diverta-uglovaya",
+      "price": 39800,
+      "stock": 10,
+      "available": true,
+      "category": 2,
+      "description": "Угловая раковина для экономии пространства.",
+      "created_at": "2026-02-11T12:00:00Z",
+      "updated_at": "2026-02-11T12:00:00Z"
+    }
+  },
+  {
+    "model": "products.product",
+    "fields": {
+      "name": "Roca The Gap Унитаз подвесной",
+      "slug": " roca-the-gap-unitaz",
+      "price": 45600,
+      "stock": 11,
+      "available": true,
+      "category": 3,
+      "description": "Компактный безободковый унитаз.",
+      "created_at": "2026-02-11T12:00:00Z",
+      "updated_at": "2026-02-11T12:00:00Z"
+    }
+  },
+  {
+    "model": "products.product",
+    "fields": {
+      "name": "Ideal Standard Tesi Унитаз",
+      "slug": "ideal-standard-tesi",
+      "price": 38900,
+      "stock": 14,
+      "available": true,
+      "category": 3,
+      "description": "Подвесной унитаз с тонким сиденьем.",
+      "created_at": "2026-02-11T12:00:00Z",
+      "updated_at": "2026-02-11T12:00:00Z"
+    }
+  },
+  {
+    "model": "products.product",
+    "fields": {
+      "name": "Jacob Delafon Struktura Унитаз",
+      "slug": "jacob-delafon-struktura",
+      "price": 51200,
+      "stock": 7,
+      "available": true,
+      "category": 3,
+      "description": "Безободковый унитаз с системой AquaBlade.",
+      "created_at": "2026-02-11T12:00:00Z",
+      "updated_at": "2026-02-11T12:00:00Z"
+    }
+  },
+  {
+    "model": "products.product",
+    "fields": {
+      "name": "Cersanit Carina Биде подвесное",
+      "slug": "cersanit-carina-bide",
+      "price": 28900,
+      "stock": 16,
+      "available": true,
+      "category": 3,
+      "description": "Компактное подвесное биде.",
+      "created_at": "2026-02-11T12:00:00Z",
+      "updated_at": "2026-02-11T12:00:00Z"
+    }
+  },
+  {
+    "model": "products.product",
+    "fields": {
+      "name": "Roca Meridian Унитаз напольный",
+      "slug": "roca-meridian",
+      "price": 67800,
+      "stock": 5,
+      "available": true,
+      "category": 3,
+      "description": "Напольный унитаз с двойным смывом.",
+      "created_at": "2026-02-11T12:00:00Z",
+      "updated_at": "2026-02-11T12:00:00Z"
+    }
+  },
+  {
+    "model": "products.product",
+    "fields": {
+      "name": "Roca Contesa Ванна стальная",
+      "slug": "roca-contesa",
+      "price": 45600,
+      "stock": 12,
+      "available": true,
+      "category": 4,
+      "description": "Стальная ванна 170x70 с антискользящим покрытием.",
+      "created_at": "2026-02-11T12:00:00Z",
+      "updated_at": "2026-02-11T12:00:00Z"
+    }
+  },
+  {
+    "model": "products.product",
+    "fields": {
+      "name": "Cersanit Santana Ванна акриловая",
+      "slug": "cersanit-santana",
+      "price": 34800,
+      "stock": 15,
+      "available": true,
+      "category": 4,
+      "description": "Акриловая ванна 170x75.",
+      "created_at": "2026-02-11T12:00:00Z",
+      "updated_at": "2026-02-11T12:00:00Z"
+    }
+  },
+  {
+    "model": "products.product",
+    "fields": {
+      "name": "Kaldewei Classic Duo Ванна",
+      "slug": "kaldewei-classic-duo",
+      "price": 198000,
+      "stock": 3,
+      "available": true,
+      "category": 4,
+      "description": "Стальная эмалированная ванна премиум-класса.",
+      "created_at": "2026-02-11T12:00:00Z",
+      "updated_at": "2026-02-11T12:00:00Z"
+    }
+  },
+  {
+    "model": "products.product",
+    "fields": {
+      "name": "Jacob Delafon Elite Ванна",
+      "slug": "jacob-delafon-elite",
+      "price": 156000,
+      "stock": 4,
+      "available": true,
+      "category": 4,
+      "description": "Акриловая ванна с гидромассажем.",
+      "created_at": "2026-02-11T12:00:00Z",
+      "updated_at": "2026-02-11T12:00:00Z"
+    }
+  },
+  {
+    "model": "products.product",
+    "fields": {
+      "name": "Roca Haiti Ванна чугунная",
+      "slug": "roca-haiti",
+      "price": 248000,
+      "stock": 2,
+      "available": true,
+      "category": 4,
+      "description": "Классическая чугунная ванна.",
+      "created_at": "2026-02-11T12:00:00Z",
+      "updated_at": "2026-02-11T12:00:00Z"
+    }
+  }
+]
+
+]

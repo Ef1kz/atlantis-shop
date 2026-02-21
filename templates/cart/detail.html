@@ -11,11 +11,30 @@
     <div class="col-md-8">
         {% for item in cart_items %}
         <div class="card bg-dark text-white mb-3">
-            <div class="card-body">
-                <h5 class="card-title gold">{{ item.name }}</h5>
-                <p>Количество: {{ item.quantity }}</p>
-                <p>Цена за шт: {{ item.price }} ₽</p>
-                <p>Итого: {{ item.subtotal|floatformat:2 }} ₽</p>
+            <div class="card-body d-flex">
+                <!-- Фото товара (кликабельное) -->
+                {% if item.product.image %}
+                <a href="{% url 'products:product_detail' item.product.pk %}">
+                    <img src="{{ item.product.image.url }}" alt="{{ item.name }}" class="me-3" style="width: 120px; height: 120px; object-fit: cover; border-radius: 8px;">
+                </a>
+                {% else %}
+                <a href="{% url 'products:product_detail' item.product.pk %}">
+                    <img src="https://via.placeholder.com/120?text=No+Image" alt="Нет фото" class="me-3" style="width: 120px; height: 120px; object-fit: cover; border-radius: 8px;">
+                </a>
+                {% endif %}
+
+                <div class="flex-grow-1">
+                    <!-- Название товара (кликабельное) -->
+                    <h5 class="card-title gold">
+                        <a href="{% url 'products:product_detail' item.product.pk %}" class="text-gold text-decoration-none">
+                            {{ item.name }}
+                        </a>
+                    </h5>
+                    <p>Количество: {{ item.quantity }}</p>
+                    <p>Цена за шт: {{ item.price }} ₽</p>
+                    <p>Итого: {{ item.subtotal|floatformat:2 }} ₽</p>
+                    <a href="{% url 'cart:remove' item.id %}" class="btn btn-danger btn-sm">Удалить</a>
+                </div>
             </div>
         </div>
         {% endfor %}

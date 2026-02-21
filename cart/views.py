@@ -1,122 +1,112 @@
-# cart/views.py
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.http import JsonResponse
-from django.views.decorators.http import require_POST
-from django.contrib.auth.decorators import login_required
-from django.views.decorators.cache import never_cache
 from products.models import Product
-from orders.models import Order, OrderItem
+from .models import Cart, CartItem
+from django.contrib.auth.decorators import login_required  # ← Добавь импорт
+from orders.models import Order, OrderItem  # ← Добавь импорт моделей заказов
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_POST
 
-@require_POST
-def cart_add(request, product_id):
-    """Добавление товара в корзину"""
-    product = get_object_or_404(Product, id=product_id)
-    cart = request.session.get('cart', {})
-    cart = dict(cart)
 
-    product_id_str = str(product_id)
-    if product_id_str in cart:
-        cart[product_id_str]['quantity'] += 1
+def get_or_create_cart(request):
+    if request.user.is_authenticated:
+        cart, _ = Cart.objects.get_or_create(user=request.user)
     else:
-        cart[product_id_str] = {
-            'name': product.name,
-            'price': str(product.price),
-            'quantity': 1
-        }
+        if not request.session.session_key:
+            request.session.create()
+            request.session['cart_active'] = True
 
-    request.session['cart'] = cart
-    request.session.modified = True
-    print(">>> СЕССИЯ ПОСЛЕ ДОБАВЛЕНИЯ:", request.session.get('cart'))
+        cart, _ = Cart.objects.get_or_create(session_key=request.session.session_key)
 
-    return redirect('cart:detail')
+    return cart
+
+@csrf_exempt
+@require_POST
+def add(request, product_id):
+    try:
+        cart = get_or_create_cart(request)
+        product = get_object_or_404(Product, id=product_id)
+
+        item, created = CartItem.objects.get_or_create(cart=cart, product=product)
+
+        if not created:
+            item.quantity += 1
+            item.save()
+
+        return JsonResponse({
+            'success': True,
+            'count': sum(i.quantity for i in cart.items.all())
+        })
+
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)}, status=500)
 
 
-def cart_detail(request):
-    """Просмотр корзины"""
-    cart = request.session.get('cart', {})
-    print(">>> СЕССИЯ В КОРЗИНЕ:", cart)
+def detail(request):
+    cart = get_or_create_cart(request)
+    cart_items = cart.items.all()
 
-    cart_items = []
-    total = 0
-    for product_id, item in cart.items():
-        try:
-            price = float(item['price'])
-            quantity = item['quantity']
-            subtotal = price * quantity
-            total += subtotal
-            cart_items.append({
-                'product_id': product_id,
-                'name': item['name'],
-                'price': price,
-                'quantity': quantity,
-                'subtotal': subtotal
-            })
-        except (KeyError, ValueError):
-            continue
+    total = sum(item.product.price * item.quantity for item in cart_items)
 
     return render(request, 'cart/detail.html', {
+        'cart': cart,
         'cart_items': cart_items,
         'total': total
     })
 
 
-def cart_count(request):
-    """Получение количества товаров в корзине (для AJAX)"""
-    cart = request.session.get('cart', {})
-    count = sum(item.get('quantity', 0) for item in cart.values())
-    return JsonResponse({'count': count})
+# 🔥 ДОБАВЛЕН checkout
+def checkout(request):
+    cart = get_or_create_cart(request)
+    cart_items = cart.items.all()
 
+    if not cart_items:
+        return redirect('cart:detail')  # Если корзина пуста — назад
 
-@login_required
-def cart_checkout(request):
-    """Оформление заказа"""
-    cart = request.session.get('cart', {})
-    if not cart:
-        return redirect('cart:detail')
+    total = sum(item.product.price * item.quantity for item in cart_items)
 
     if request.method == 'POST':
-        address = request.POST.get('address', '')
-        phone = request.POST.get('phone', '')
-
-        # Создаем заказ
+        # Создаём заказ
         order = Order.objects.create(
-            user=request.user,
-            status='pending',
-            total_amount=0,
-            delivery_address=address,
-            phone=phone
+            user=request.user if request.user.is_authenticated else None,
+            total_amount=total,
+            delivery_address=request.POST.get('delivery_address', ''),
+            phone=request.POST.get('phone', ''),
+            email=request.POST.get('email', request.user.email if request.user.is_authenticated else '')
         )
 
-        total = 0
-        for product_id, item in cart.items():
-            try:
-                product = Product.objects.get(id=product_id)
-                price = float(item['price'])
-                quantity = item['quantity']
-                subtotal = price * quantity
-                total += subtotal
-
-                OrderItem.objects.create(
-                    order=order,
-                    product=product,
-                    quantity=quantity,
-                    price=price
-                )
-            except Product.DoesNotExist:
-                continue
-
-        order.total_amount = total
-        order.save()
+        # Копируем товары из корзины в заказ
+        for item in cart_items:
+            OrderItem.objects.create(
+                order=order,
+                product=item.product,
+                quantity=item.quantity,
+                price=item.product.price
+            )
 
         # Очищаем корзину
-        request.session['cart'] = {}
-        request.session.modified = True
+        cart.items.all().delete()
 
         return redirect('cart:checkout_success')
 
-    return render(request, 'cart/checkout.html')
+    # GET — показываем форму оформления
+    return render(request, 'cart/checkout.html', {
+        'cart_items': cart_items,
+        'total': total
+    })
 
 
+# 🔥 ДОБАВЛЕН checkout_success
 def checkout_success(request):
-    """Страница успешного оформления заказа"""
     return render(request, 'cart/checkout_success.html')
+
+
+def count(request):
+    cart = get_or_create_cart(request)
+    return JsonResponse({'count': sum(i.quantity for i in cart.items.all())})
+
+def remove(request, item_id):
+    cart = get_or_create_cart(request)
+    item = get_object_or_404(CartItem, id=item_id, cart=cart)
+    item.delete()
+    return redirect('cart:detail')  # Редирект обратно в корзину

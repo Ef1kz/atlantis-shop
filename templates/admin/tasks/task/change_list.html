@@ -3,166 +3,220 @@
 
 {% block extrahead %}
 {{ block.super }}
+
+
+
 <meta name="csrf-token" content="{{ csrf_token }}">
 <style>
-    /* 1. Глобальный макет для Kanban */
-    {% if current_view == 'kanban' %}
-    html, body { height: 100%; overflow: hidden; background: #0a0a0a; }
-    #container { height: 100%; display: flex; flex-direction: column; }
-    #content { flex: 1; display: flex; flex-direction: column; padding: 0 !important; overflow: hidden; }
-    #content h1 { display: none; }
-    {% endif %}
 
-    .kanban-wrapper { display: flex; flex-direction: column; height: 100%; background: #0f0f0f; }
-
-    .kanban-board {
-        display: flex; gap: 20px; padding: 20px;
-        overflow-x: auto; flex: 1; align-items: flex-start;
+        /* Делаем форму выхода строчной, чтобы она не перекрывала всё вокруг */
+    #logout-form {
+      display: inline !important;
+      margin: 0 !important;
+      padding: 0 !important;
     }
 
-    /* 2. Колонки */
-    .kanban-col {
-        min-width: 295px; width: 295px; flex-shrink: 0;
-        background: #161616; border-radius: 12px;
-        display: flex; flex-direction: column;
-        max-height: calc(100vh - 140px); border: 1px solid #252525;
+    /* Убираем "мертвые зоны" у контейнеров заголовка */
+    #user-tools {
+      pointer-events: none !important; /* Контейнер прозрачен для клика */
     }
 
-    .col-header {
-        padding: 15px 20px; background: #1e1e1e; border-radius: 12px 12px 0 0;
-        display: flex; justify-content: space-between; border-bottom: 2px solid #333;
+    #user-tools a,
+    #user-tools button,
+    #user-tools form {
+      pointer-events: auto !important; /* А сами элементы — кликабельны */
     }
 
-    .kanban-tasks { padding: 12px; overflow-y: auto; flex: 1; min-height: 100px; }
-
-    /* 3. Дизайн карточек */
-    .task-card {
-        background: #222; margin-bottom: 12px; padding: 16px; border-radius: 10px;
-        cursor: grab; border: 1px solid #333; transition: all 0.2s ease;
-        position: relative; box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+    /* Увеличиваем область клика для мелких ссылок */
+    #user-tools a {
+      padding: 10px 5px !important;
+      margin: -10px 0 !important;
     }
 
-    .task-card:hover { transform: translateY(-3px); border-color: #f4a261; box-shadow: 0 8px 15px rgba(244, 162, 97, 0.1); }
 
-    .priority-badge {
-        display: inline-block; padding: 2px 8px; border-radius: 4px;
-        font-size: 10px; font-weight: 800; text-transform: uppercase; margin-bottom: 8px;
-    }
-    .badge-high { background: #e63946; color: #fff; }
-    .badge-medium { background: #f4a261; color: #fff; }
-    .badge-low { background: #2a9d8f; color: #fff; }
+  /* 1. Делаем кнопки "кликабельными" поверх любых слоев */
+.header-controls, .user-info, .kanban-header {
+  position: relative !important;
+  z-index: 9999 !important; /* Поднимаем на самый верх */
+  pointer-events: auto !important;
+}
 
-    .task-title { font-weight: 600; color: #fff; font-size: 15px; margin-bottom: 10px; }
-    .task-footer { display: flex; justify-content: space-between; font-size: 11px; color: #888; border-top: 1px solid #333; padding-top: 10px; }
+/* 2. Убираем хлебные крошки, которые часто невидимым слоем перекрывают верх страницы */
+.breadcrumbs {
+  display: none !important;
+}
 
-    /* 4. Модальное окно и поля */
-    .modal {
-        display: none;
-        position: fixed;
-        z-index: 9999;
-        left: 0;
-        top: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0,0,0,0.85);
-        backdrop-filter: blur(4px);
-        overflow-y: auto;  /* Важно: позволяет скроллить весь модал */
-        padding: 20px 0;   /* отступы сверху/снизу для мобильных */
-    }
-    .modal-content {
-        background: #1a1a1a;
-        color: white;
-        padding: 30px;
-        border-radius: 15px;
-        max-width: 620px;
-        margin: 0 auto;  /* центрирование */
-        border: 1px solid #333;
-        max-height: 90vh;  /* ограничиваем высоту */
-        overflow-y: auto;  /* внутренний скролл контента */
-        display: flex;
-        flex-direction: column;
-    }
+/* 3. Если в твоей версии админки заголовок #header фиксированный,
+    он может "наползать" прозрачным краем на кнопки */
+#header {
+  z-index: 100 !important;
+}
 
-    .modal-buttons {
-            margin-top: auto;  /* прижимает к низу */
-            padding-top: 20px;
-            border-top: 1px solid #333;
-            display: flex;
-            justify-content: flex-end;
-            gap: 15px;
-            position: sticky;
-            bottom: 0;
-            background: #1a1a1a;  /* фон как у модала */
-            padding: 15px 0;
-        }
+/* 4. На всякий случай даем кнопкам область нажатия побольше (padding) */
+.user-info a, .user-info button {
+  display: inline-block;
+  padding: 5px 2px;
+  cursor: pointer;
+}
 
-    .modal-content select, .modal-content input, .modal-content textarea {
-        width: 100% !important; box-sizing: border-box !important;
-        background: #252525; border: 1px solid #444; color: white;
-        padding: 10px 12px; border-radius: 6px; margin-top: 5px; font-size: 14px; min-height: 42px;
-    }
+/* 1. Глобальный макет для Kanban */
+{% if current_view == 'kanban' %}
+html, body { height: 100%; overflow: hidden; background: #0a0a0a; }
+#container { height: 100%; display: flex; flex-direction: column; }
+#content { flex: 1; display: flex; flex-direction: column; padding: 0 !important; overflow: hidden; }
+#content h1 { display: none; }
+{% endif %}
 
-    .modal-content textarea { min-height: 80px; resize: vertical; }
+.kanban-wrapper { display: flex; flex-direction: column; height: 100%; background: #0f0f0f; }
 
-    .fields-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-top: 15px; }
+.kanban-board {
+  display: flex; gap: 20px; padding: 20px;
+  overflow-x: auto; flex: 1; align-items: flex-start;
+}
 
-    .field-group { display: flex; flex-direction: column; }
-    .field-group label { font-size: 11px; color: #aaa; text-transform: uppercase; margin-bottom: 2px; }
+/* 2. Колонки */
+.kanban-col {
+  min-width: 295px; width: 295px; flex-shrink: 0;
+  background: #161616; border-radius: 12px;
+  display: flex; flex-direction: column;
+  max-height: calc(100vh - 140px); border: 1px solid #252525;
+}
 
-    .file-attach { display: flex; align-items: center; margin-top: 10px; gap: 10px; color: #aaa; }
-    .file-attach input { flex: 1; background: none; border: none; color: white; }
+.col-header {
+  padding: 15px 20px; background: #1e1e1e; border-radius: 12px 12px 0 0;
+  display: flex; justify-content: space-between; border-bottom: 2px solid #333;
+}
 
-    .comments-section { margin-top: 30px; border-top: 1px solid #333; padding-top: 15px; max-height: 300px; overflow-y: auto; }
-    .comments-section h4 { font-size: 13px; color: #f4a261; text-transform: uppercase; margin-bottom: 15px; }
-    .comment-item { background: #252525; padding: 12px; border-radius: 8px; margin-bottom: 12px; border: 1px solid #333; }
-    .comment-header { display: flex; justify-content: space-between; font-size: 11px; color: #888; margin-bottom: 8px; }
-    .comment-text { font-size: 13px; color: #ddd; white-space: pre-wrap; }
-    .comment-file { margin-top: 8px; font-size: 11px; color: #f4a261; display: block; text-decoration: none; }
-    .comment-file:hover { text-decoration: underline; }
+.kanban-tasks { padding: 12px; overflow-y: auto; flex: 1; min-height: 100px; }
 
-    .notify {
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        background: #28a745;           /* яркий зелёный (Bootstrap success) */
-        color: white;
-        padding: 14px 28px;
-        border-radius: 8px;
-        box-shadow: 0 4px 12px rgba(40, 167, 69, 0.4);
-        opacity: 0;
-        transition: opacity 0.4s ease, transform 0.3s ease;
-        z-index: 9999;
-        font-weight: bold;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        min-width: 240px;
-        transform: translateY(-20px);
-    }
+/* 3. Дизайн карточек */
+.task-card {
+  background: #222; margin-bottom: 12px; padding: 16px; border-radius: 10px;
+  cursor: grab; border: 1px solid #333; transition: all 0.2s ease;
+  position: relative; box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+}
 
-    .notify::before {
-        content: "✓";
-        font-size: 20px;
-    }
+.task-card:hover { transform: translateY(-3px); border-color: #f4a261; box-shadow: 0 8px 15px rgba(244, 162, 97, 0.1); }
 
-    .notify.show {
-        opacity: 1;
-        transform: translateY(0);
-    }
+.priority-badge {
+  display: inline-block; padding: 2px 8px; border-radius: 4px;
+  font-size: 10px; font-weight: 800; text-transform: uppercase; margin-bottom: 8px;
+}
+.badge-high { background: #e63946; color: #fff; }
+.badge-medium { background: #f4a261; color: #fff; }
+.badge-low { background: #2a9d8f; color: #fff; }
 
-    .modal-content input[type="submit"] {
-        background: #f4a261 !important;
-        color: #000 !important;
-        font-weight: bold !important;
-        border: none !important;
-        padding: 10px 20px !important;
-        border-radius: 6px !important;
-        cursor: pointer;
-    }
+.task-title { font-weight: 600; color: #fff; font-size: 15px; margin-bottom: 10px; }
+.task-footer { display: flex; justify-content: space-between; font-size: 11px; color: #888; border-top: 1px solid #333; padding-top: 10px; }
 
-    .modal-content input[type="submit"]:hover {
-        opacity: 0.9;
-    }
+/* 4. Модальное окно и поля */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 9999;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.85);
+  backdrop-filter: blur(4px);
+  overflow-y: auto;  /* Важно: позволяет скроллить весь модал */
+  padding: 20px 0;   /* отступы сверху/снизу для мобильных */
+}
+.modal-content {
+  background: #1a1a1a;
+  color: white;
+  padding: 30px;
+  border-radius: 15px;
+  max-width: 620px;
+  margin: 0 auto;  /* центрирование */
+  border: 1px solid #333;
+  max-height: 90vh;  /* ограничиваем высоту */
+  overflow-y: auto;  /* внутренний скролл контента */
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-buttons {
+      margin-top: auto;  /* прижимает к низу */
+      padding-top: 20px;
+      border-top: 1px solid #333;
+      display: flex;
+      justify-content: flex-end;
+      gap: 15px;
+      position: sticky;
+      bottom: 0;
+      background: #1a1a1a;  /* фон как у модала */
+      padding: 15px 0;
+  }
+
+.modal-content select, .modal-content input, .modal-content textarea {
+  width: 100% !important; box-sizing: border-box !important;
+  background: #252525; border: 1px solid #444; color: white;
+  padding: 10px 12px; border-radius: 6px; margin-top: 5px; font-size: 14px; min-height: 42px;
+}
+
+.modal-content textarea { min-height: 80px; resize: vertical; }
+
+.fields-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-top: 15px; }
+
+.field-group { display: flex; flex-direction: column; }
+.field-group label { font-size: 11px; color: #aaa; text-transform: uppercase; margin-bottom: 2px; }
+
+.file-attach { display: flex; align-items: center; margin-top: 10px; gap: 10px; color: #aaa; }
+.file-attach input { flex: 1; background: none; border: none; color: white; }
+
+.comments-section { margin-top: 30px; border-top: 1px solid #333; padding-top: 15px; max-height: 300px; overflow-y: auto; }
+.comments-section h4 { font-size: 13px; color: #f4a261; text-transform: uppercase; margin-bottom: 15px; }
+.comment-item { background: #252525; padding: 12px; border-radius: 8px; margin-bottom: 12px; border: 1px solid #333; }
+.comment-header { display: flex; justify-content: space-between; font-size: 11px; color: #888; margin-bottom: 8px; }
+.comment-text { font-size: 13px; color: #ddd; white-space: pre-wrap; }
+.comment-file { margin-top: 8px; font-size: 11px; color: #f4a261; display: block; text-decoration: none; }
+.comment-file:hover { text-decoration: underline; }
+
+.notify {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #28a745;           /* яркий зелёный (Bootstrap success) */
+  color: white;
+  padding: 14px 28px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(40, 167, 69, 0.4);
+  opacity: 0;
+  transition: opacity 0.4s ease, transform 0.3s ease;
+  z-index: 9999;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 240px;
+  transform: translateY(-20px);
+}
+
+.notify::before {
+  content: "✓";
+  font-size: 20px;
+}
+
+.notify.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.modal-content input[type="submit"] {
+  background: #f4a261 !important;
+  color: #000 !important;
+  font-weight: bold !important;
+  border: none !important;
+  padding: 10px 20px !important;
+  border-radius: 6px !important;
+  cursor: pointer;
+}
+
+.modal-content input[type="submit"]:hover {
+  opacity: 0.9;
+}
 </style>
 {% endblock %}
 

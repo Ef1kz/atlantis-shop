@@ -20,6 +20,8 @@ class Review(models.Model):
     class Meta:
         ordering = ['-created_at']
         unique_together = ('product', 'user')
+        verbose_name = 'отзыв'
+        verbose_name_plural = 'отзывы'
 
     def __str__(self):
         return f"Review by {self.user.username} for {self.product.name}"

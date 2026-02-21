@@ -4,6 +4,7 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 
+
 urlpatterns = [
     # ==================== ОСНОВНОЙ САЙТ (МАГАЗИН) ====================
     path('', include('core.urls')),  # Главная страница магазина
@@ -22,6 +23,7 @@ urlpatterns = [
 
     # ==================== АДМИНКА ====================
     path('admin/', admin.site.urls),
+    path('reviews/', include('reviews.urls')),
 ]
 
 # ==================== MEDIA ДЛЯ РАЗРАБОТКИ ====================

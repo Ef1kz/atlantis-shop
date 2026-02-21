@@ -41,7 +41,11 @@ def task_detail(request, task_id):
 @require_POST
 def update_status(request, task_id):
     try:
-        data = json.loads(request.body)
+        # Поддержка и JSON (Postman), и form-data
+        if request.content_type == 'application/json':
+            data = json.loads(request.body)
+        else:
+            data = request.POST
         new_status = data.get('status')
         if not new_status:
             return JsonResponse({'success': False, 'error': 'Статус не указан'}, status=400)

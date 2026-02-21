@@ -10,6 +10,9 @@ class Order(models.Model):
         ('delivered', 'Доставлен'),
         ('cancelled', 'Отменён'),
     ]
+    class Meta:
+        verbose_name = 'заказ'  # Единичное
+        verbose_name_plural = 'заказы'  # Множественное (будет в sidebar)
 
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,  # ← Исправлено
@@ -39,3 +42,6 @@ class OrderItem(models.Model):
 
     def __str__(self):
         return f"{self.quantity} x {self.product.name} in Order #{self.order.id}"
+    class Meta:
+        verbose_name = 'элемент заказа'
+        verbose_name_plural = 'элементы заказа'  # Переведённый "Order items"

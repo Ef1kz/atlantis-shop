@@ -1,10 +1,10 @@
 from django.db import models
-from django.conf import settings  # ← Добавить импорт
+from django.conf import settings
 from products.models import Product
 
 class Cart(models.Model):
     user = models.ForeignKey(
-        settings.AUTH_USER_MODEL,  # ← Исправлено
+        settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name='carts',
         null=True,
@@ -16,6 +16,9 @@ class Cart(models.Model):
 
     def __str__(self):
         return f"Cart {self.id} for {self.user if self.user else 'anonymous'}"
+    class Meta:
+        verbose_name = 'корзина'
+        verbose_name_plural = 'корзины'  # Вместо "Carts"
 
 class CartItem(models.Model):
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE, related_name='items')
@@ -25,6 +28,20 @@ class CartItem(models.Model):
 
     class Meta:
         unique_together = ('cart', 'product')
+        verbose_name = 'элемент корзины'
+        verbose_name_plural = 'элементы корзины'
 
     def __str__(self):
         return f"{self.quantity} x {self.product.name}"
+
+    @property
+    def price(self):
+        return self.product.price
+
+    @property
+    def subtotal(self):
+        return self.product.price * self.quantity
+
+    @property
+    def name(self):
+        return self.product.name

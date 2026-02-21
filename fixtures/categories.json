@@ -1,0 +1,38 @@
+[
+  {
+    "model": "products.category",
+    "pk": 1,
+    "fields": {
+      "name": "СМЕСИТЕЛИ",
+      "slug": "smesiteli",
+      "parent": null
+    }
+  },
+  {
+    "model": "products.category",
+    "pk": 2,
+    "fields": {
+      "name": "РАКОВИНЫ",
+      "slug": "rakoviny",
+      "parent": null
+    }
+  },
+  {
+    "model": "products.category",
+    "pk": 3,
+    "fields": {
+      "name": "УНИТАЗЫ И БИДЕ",
+      "slug": "unitazy-i-bide",
+      "parent": null
+    }
+  },
+  {
+    "model": "products.category",
+    "pk": 4,
+    "fields": {
+      "name": "ВАННЫ",
+      "slug": "vanny",
+      "parent": null
+    }
+  }
+]

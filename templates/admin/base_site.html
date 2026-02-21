@@ -6,8 +6,88 @@
 
 {% block extrastyle %}
 {{ block.super }}
+
 <link rel="stylesheet" href="{% static 'admin/css/kanban.css' %}">
+<link rel="stylesheet" href="{% static 'admin/custom_admin.css' %}">
 <style>
+
+        /* Разделяем кнопки в шапке и убираем невидимые перекрытия */
+    #user-tools {
+        display: flex !important;
+        align-items: center !important;
+        gap: 15px !important; /* Четкий отступ между кнопками */
+        position: relative !important;
+        z-index: 10000 !important;
+    }
+
+    #user-tools form {
+        display: inline-block !important;
+        margin: 0 !important;
+    }
+
+    #user-tools button, #user-tools a {
+        padding: 8px 12px !important; /* Увеличиваем область клика */
+        line-height: 1 !important;
+        text-decoration: none !important;
+    }
+
+    /* Принудительно отключаем клики для фоновых контейнеров, которые могут мешать */
+    #header, .breadcrumbs {
+        pointer-events: none;
+    }
+    #header a, #header form, #user-tools * {
+        pointer-events: auto; /* Включаем клики только для самих кнопок */
+    }
+
+        /* Делаем форму выхода строчной, чтобы она не перекрывала всё вокруг */
+    #logout-form {
+        display: inline !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    /* Убираем "мертвые зоны" у контейнеров заголовка */
+    #user-tools {
+        pointer-events: none !important; /* Контейнер прозрачен для клика */
+    }
+
+    #user-tools a,
+    #user-tools button,
+    #user-tools form {
+        pointer-events: auto !important; /* А сами элементы — кликабельны */
+    }
+
+    /* Увеличиваем область клика для мелких ссылок */
+    #user-tools a {
+        padding: 10px 5px !important;
+        margin: -10px 0 !important;
+    }
+
+        /* 1. Делаем кнопки "кликабельными" поверх любых слоев */
+    .header-controls, .user-info, .kanban-header {
+        position: relative !important;
+        z-index: 9999 !important; /* Поднимаем на самый верх */
+        pointer-events: auto !important;
+    }
+
+    /* 2. Убираем хлебные крошки, которые часто невидимым слоем перекрывают верх страницы */
+    .breadcrumbs {
+        display: none !important;
+    }
+
+    /* 3. Если в твоей версии админки заголовок #header фиксированный,
+          он может "наползать" прозрачным краем на кнопки */
+    #header {
+        z-index: 100 !important;
+    }
+
+    /* 4. На всякий случай даем кнопкам область нажатия побольше (padding) */
+    .user-info a, .user-info button {
+        display: inline-block;
+        padding: 5px 2px;
+        cursor: pointer;
+    }
+
     /* ==================== ЦВЕТОВАЯ СХЕМА ATLANTIS ==================== */
     :root {
         --atlantis-gold: #FCC6A9;
